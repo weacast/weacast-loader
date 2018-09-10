@@ -1,0 +1,32 @@
+{
+  "name": "weacast-loader",
+  "description": "Weather forecast model data dowloader for Weacast",
+  "version": "0.1.0",
+  "homepage": "https://github.com/weacast/weacast-loader",
+  "keywords": [
+    "krawler",
+    "feathers",
+    "arpege",
+    "gis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/weacast/weacast-loader.git"
+  },
+  "author": {
+    "name": "Kalisio",
+    "url": "https://github.com/kalisio"
+  },
+  "contributors": [],
+  "bugs": {
+    "url": "https://github.com/weacast/weacast-loader/issues"
+  },
+  "scripts": {
+    "test": "echo \"Warning: no test specified\"",
+    "release:patch": "npm version --no-git-tag-version --force patch",
+    "release:minor": "npm version --no-git-tag-version --force minor",
+    "release:major": "npm version --no-git-tag-version --force major"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

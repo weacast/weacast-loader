@@ -1,0 +1,7 @@
+FROM  weacast/weacast-gfs
+
+MAINTAINER Kalisio <contact@kalisio.xyz>
+
+COPY jobfile-gfs-world.js .
+
+CMD krawler --cron "0 */15 * * * *" jobfile-gfs-world.js
