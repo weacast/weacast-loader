@@ -1,0 +1,7 @@
+FROM  weacast/weacast-arpege
+
+MAINTAINER Kalisio <contact@kalisio.xyz>
+
+COPY jobfile-arpege-france.js .
+
+CMD krawler --cron "0 */15 * * * *" jobfile-arpege-france.js
