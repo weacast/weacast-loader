@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+- '8'
+sudo: required
+services:
+- docker
+notifications:
+  email: false
+  slack:
+    rooms:
+      secure: 1cCV9MCdY+Vb7WPhMqrOPypqPP3hFfXEbutyYE9SMBi9jVycUVRL7GDRTrUR3V2W2hQ491fjIYST4XqEF+DhDZ+IHLmX/qqklVoj+uVViG2Q/XIxqUGLXYBcKHWrxoZi2ebMWjFnh7+0PBh6tEXhQ3JSBcrCNgD/y5JvmlqUugLTFY//MdM0rocegni2d0iTxJajH8fyfn7GmhxfHc2CSjP9R9iXFgOsg862hDHnSdHWwctt/R/Z1LsCLvruJ17z7nOuLPAtkHn3/QjQM691hV3kuiWtSKWL1HmNf2eE7fBtF/1/XOY6pxpmn/OirKarFXI5e7cnT1NBxdbe/sKEa3dVWrYBCEB2Ys1cK0vzqfd182SZdL59kLmesYTWXXO0vSa0IxxU6dbPbc7QSjhXFb3oFQ7Dt7npR/jqhfuaF6ZIyJfl6rHXc+Tm6t3Gtxv901wOswj7Vr8XOy+d+Mx7XfLZ2psndxaUcj7mmo2Fx9dGaF9f32tS8ozRUteTeUWs/kuCCrpOCDcn75qwSwiaLaNk8KhMdHytJrLnlzlXeM67VKJHCc424krkzNRj96ixtA38mqGX4A8Jlt3uigZg3xnHr+1bgNLvwl+XlGxPYpiqty+XBpj2n0G8jyXfd3I9+yVS34j/5XZNJHaV4lN2VkFWR5BXopCLtIEypcecv7Y=
+    on_success: always
+    on_failure: always
+script:
+- export VERSION=$(node -p -e "require('./package.json').version")
+- docker build -f dockerfile.arpege -t weacast/weacast-arpege .
+- docker tag weacast/weacast-arpege weacast/weacast-arpege:$VERSION
+- docker build -f dockerfile.gfs -t weacast/weacast-gfs .
+- docker tag weacast/weacast-gfs weacast/weacast-gfs:$VERSION
+- docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
+- docker push weacast/weacast-arpege:$VERSION
+- docker push weacast/weacast-gfs:$VERSION
