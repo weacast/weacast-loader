@@ -1,4 +1,4 @@
-# Weacat loader
+# Weacast loader
 
 [![Build Status](https://travis-ci.org/weacast/weacast-loader.png?branch=master)](https://travis-ci.org/weacast/weacast-loader)
 
