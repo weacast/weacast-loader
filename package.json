@@ -41,6 +41,9 @@
     ]
   },
   "dependencies": {
+    "@kalisio/krawler": "^0.7.0",
+    "weacast-grib2json": "^0.2.3",
+    "weacast-gtiff2json": "^0.2.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -58,11 +61,8 @@
     "shx": "^0.2.2",
     "standard": "^10.0.2",
     "fs-extra": "^4.0.2",
-    "mongodb": "^3.0.10",
-    "@kalisio/krawler": "^0.7.0"
+    "mongodb": "^3.0.10"
   },
   "peerDependencies": {
-    "weacast-grib2json": "^0.2.2",
-    "weacast-gtiff2json": "^0.2.0"
   }
 }

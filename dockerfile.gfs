@@ -17,7 +17,7 @@ RUN apt-get clean
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 RUN $JAVA_HOME/bin/java -version
 
-RUN npm install -g weacast-grib2json --unsafe
+RUN npm install -g weacast-grib2json@0.2.3 --unsafe
 RUN npm install -g @kalisio/krawler@0.7.0 --unsafe
 
 COPY job-gfs.js .
