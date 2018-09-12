@@ -1,6 +1,5 @@
 language: node_js
 node_js:
-- '7'
 - '8'
 sudo: required
 services:
@@ -27,12 +26,4 @@ before_script:
 - npm install -g weacast-grib2json
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
-script:
-- export VERSION=$(node -p -e "require('./package.json').version")
-- docker build -f dockerfile.arpege -t weacast/weacast-arpege .
-- docker tag weacast/weacast-arpege weacast/weacast-arpege:$VERSION
-- docker build -f dockerfile.gfs -t weacast/weacast-gfs .
-- docker tag weacast/weacast-gfs weacast/weacast-gfs:$VERSION
-- docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
-- docker push weacast/weacast-arpege:$VERSION
-- docker push weacast/weacast-gfs:$VERSION
+- bash travis.build.sh
