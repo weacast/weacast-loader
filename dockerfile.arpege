@@ -11,4 +11,4 @@ ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 RUN npm install -g weacast-gtiff2json --unsafe
 RUN npm install -g @kalisio/krawler@0.7.0 --unsafe
 
-COPY jobfile-arpege.js .
+COPY job-arpege.js .

@@ -20,4 +20,4 @@ RUN $JAVA_HOME/bin/java -version
 RUN npm install -g weacast-grib2json --unsafe
 RUN npm install -g @kalisio/krawler@0.7.0 --unsafe
 
-COPY jobfile-gfs.js .
+COPY job-gfs.js .
