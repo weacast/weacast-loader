@@ -1,8 +1,10 @@
 const path = require('path')
+const outputPath = path.join(__dirname, 'forecast-data')
 
 const defaults = {
   id: 'weacast-arpege',
   model: 'arpege',
+  dbUrl: 'mongodb://127.0.0.1:27017/weacast',
   request: {},
   subsets: {},
   nwp: {},
@@ -61,7 +63,7 @@ module.exports = (options) => {
         },
         after: {
           runCommand: {
-            command: 'weacast-gtiff2json ./output/<%= id %> -o ./output/<%= id %>.json'
+            command: `weacast-gtiff2json ${outputPath}/<%= id %> -o ${outputPath}/<%= id %>.json`
           },
           // This will add grid data in a data field
           readJson: {
@@ -74,14 +76,14 @@ module.exports = (options) => {
       },
       jobs: {
         before: {
-          createStores: [{
+          createStores: {
             id: 'fs',
             options: {
-              path: path.join(__dirname, 'forecast-data')
+              path: outputPath
             }
-          }],
+          },
           connectMongo: {
-            url: 'mongodb://127.0.0.1:27017/weacast',
+            url: options.dbUrl,
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           },

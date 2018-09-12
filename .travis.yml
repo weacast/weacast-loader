@@ -7,6 +7,9 @@ services:
 - docker
 - mongodb
 addons:
+  apt:
+    packages:
+    - oracle-java8-set-default
   code_climate:
     repo_token: 3f30a58b36c68a3e9436795b8a99f2f134a6d884ceb7e055ee7b39589886281d
 notifications:
@@ -18,6 +21,10 @@ notifications:
     on_failure: always
 before_script:
 - npm install -g codeclimate-test-reporter
+- export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+- "$JAVA_HOME/bin/java -version"
+- npm install -g weacast-gtiff2json
+- npm install -g weacast-grib2json
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
 script:
