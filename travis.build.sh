@@ -3,6 +3,8 @@ source travis.env.sh
 # Build docker only on release
 if [[ -z "$TRAVIS_TAG" ]]
 then
+	echo "Skipping docker images build"
+else
 	docker build -f dockerfile.arpege -t weacast/weacast-arpege .
 	docker tag weacast/weacast-arpege weacast/weacast-arpege:$VERSION
 	docker build -f dockerfile.gfs -t weacast/weacast-gfs .
