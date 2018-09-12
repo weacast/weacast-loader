@@ -7,50 +7,50 @@ import { cli as krawler } from '@kalisio/krawler'
 import loader from '..'
 
 // Helper function to update NWP tasks generation options
-function updateJobOptions(job, element) {
-	let beforeHooks = job.hooks.jobs.before
-	let afterHooks = job.hooks.jobs.after
-	let nwpOptions = beforeHooks.generateNwpTasks
-	// Keep track of intermediate files
-	delete afterHooks.clearOutputs
-	// Change DB to test
-	beforeHooks.connectMongo.url = 'mongodb://127.0.0.1:27017/weacast-test'
-	// Simplify job for testing and only request 1 element and 2 forecast times
-	Object.assign(nwpOptions, {
-		runIndex: -2, // previous run to ensure it is already available
-		upperLimit: nwpOptions.lowerLimit + nwpOptions.interval,
+function updateJobOptions (job, element) {
+  let beforeHooks = job.hooks.jobs.before
+  let afterHooks = job.hooks.jobs.after
+  let nwpOptions = beforeHooks.generateNwpTasks
+  // Keep track of intermediate files
+  delete afterHooks.clearOutputs
+  // Change DB to test
+  beforeHooks.connectMongo.url = 'mongodb://127.0.0.1:27017/weacast-test'
+  // Simplify job for testing and only request 1 element and 2 forecast times
+  Object.assign(nwpOptions, {
+    runIndex: -2, // previous run to ensure it is already available
+    upperLimit: nwpOptions.lowerLimit + nwpOptions.interval,
     elements: [element]
-	})
-	return job
+  })
+  return job
 }
 
 describe('weacast-loader', () => {
-	let dbClient, db
+  let dbClient, db
   const outputPath = path.join(__dirname, '..', 'forecast-data')
   const arpegeWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-world.js')), {
     element: 'temperature',
     model: 'arpege-world',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
-	})
+  })
   const arpegeEuropeJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-europe.js')), {
     element: 'temperature',
     model: 'arpege-europe',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
-	})
-	const aromeFranceJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arome-france.js')), {
+  })
+  const aromeFranceJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arome-france.js')), {
     element: 'temperature',
     model: 'arome-france',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
-	})
-	const gfsWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-gfs-world.js')), {
+  })
+  const gfsWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-gfs-world.js')), {
     element: 'temperature',
     model: 'gfs-world',
     name: 'var_TMP',
     levels: [ 'lev_surface' ]
-	})
+  })
 
   before(async () => {
     chailint(chai, util)
@@ -86,7 +86,7 @@ describe('weacast-loader', () => {
   .timeout(30000)
 
   it('run ARPEGE WORLD dowloader once again', async () => {
-  	const tasks = await krawler(arpegeWorldJob)
+    const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
     expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '0'))).beFalse()
@@ -125,7 +125,7 @@ describe('weacast-loader', () => {
   .timeout(30000)
 
   it('run ARPEGE EUROPE dowloader once again', async () => {
-  	const tasks = await krawler(arpegeEuropeJob)
+    const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
     expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '0'))).beFalse()
@@ -164,7 +164,7 @@ describe('weacast-loader', () => {
   .timeout(30000)
 
   it('run AROME FRANCE dowloader once again', async () => {
-  	const tasks = await krawler(aromeFranceJob)
+    const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
     expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '0'))).beFalse()
@@ -203,7 +203,7 @@ describe('weacast-loader', () => {
   .timeout(30000)
 
   it('run GFS WORLD dowloader once again', async () => {
-  	const tasks = await krawler(gfsWorldJob)
+    const tasks = await krawler(gfsWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
     expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '0'))).beFalse()
