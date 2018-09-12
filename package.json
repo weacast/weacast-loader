@@ -59,7 +59,7 @@
     "standard": "^10.0.2",
     "fs-extra": "^4.0.2",
     "mongodb": "^3.0.10",
-    "@kalisio/krawler": "^0.7.0"
+    "@kalisio/krawler": "https://github.com/kalisio/krawler"
   },
   "peerDependencies": {
     "weacast-grib2json": "^0.2.3",

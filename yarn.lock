@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@kalisio/krawler@^0.7.0":
+"@kalisio/krawler@https://github.com/kalisio/krawler":
   version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@kalisio/krawler/-/krawler-0.7.0.tgz#16671be3b40576c918637e43e10b87710595335f"
+  resolved "https://github.com/kalisio/krawler#bfb0d1d0af7e13ecd50ba9d80302e2e06a97a16d"
   dependencies:
     "@mapbox/sphericalmercator" "^1.0.5"
     aws-sdk "^2.158.0"
