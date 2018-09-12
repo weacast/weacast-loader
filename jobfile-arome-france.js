@@ -1,5 +1,4 @@
-// ARPEGE/AROME interfaces are similar
-const createJob = require('./jobfile-arpege')
+const createJob = require('./job-arome')
 
 // Setup job name, model name, bounds and generation parameters
 module.exports = createJob({
@@ -10,13 +9,13 @@ module.exports = createJob({
   },
   subsets: {
     long: [-8, 12],
-  	lat: [38, 53]
+    lat: [38, 53]
   },
   nwp: {
     runInterval: 3 * 3600,            // Produced every 3h
     interval: 1 * 3600,               // Steps of 1h
     lowerLimit: 0,                    // From T0
-    //upperLimit: 42 * 3600,            // Up to T0+42
+    // upperLimit: 42 * 3600,            // Up to T0+42
     upperLimit: 3 * 3600              // Up to T0 + 3h for testing
   }
 })

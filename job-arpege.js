@@ -1,23 +1,23 @@
 const path = require('path')
-const fs = require('fs')
 
 const defaults = {
-  id: 'weacast-gfs',
-  model: 'gfs',
+  id: 'weacast-arpege',
+  model: 'arpege',
   request: {},
+  subsets: {},
   nwp: {},
   elements: [{
     element: 'u-wind',
-    name: 'var_UGRD',
-    levels: [ 'lev_10_m_above_ground' ]
+    name: 'U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
+    levels: [ 10 ]
   }, {
     element: 'v-wind',
-    name: 'var_VGRD',
-    levels: [ 'lev_10_m_above_ground' ]
+    name: 'V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
+    levels: [ 10 ]
   }, {
     element: 'gust',
-    name: 'var_GUST',
-    levels: [ 'lev_surface' ]
+    name: 'WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
+    levels: [ 10 ]
   }]
 }
 
@@ -32,24 +32,27 @@ module.exports = (options) => {
       faultTolerant: true
     },
     taskTemplate: {
-      //id: 'gfs/<%= element %>/<%= level %>/<%= forecastTime.format(\'YYYY-MM-DD[_]HH-mm-ss\') %>',
-      id:  `${options.model}/<%= element %>/<%= level.split(\'_\')[1] %>/<%= timeOffset / 3600 %>`,
-      type: 'http',
+      // id: 'arpege/<%= element %>/<%= level %>/<%= forecastTime.format(\'YYYY-MM-DD[_]HH-mm-ss\') %>',
+      id: `${options.model}/<%= element %>/<%= level %>/<%= timeOffset / 3600 %>`,
+      type: 'wcs',
       // Common options for models, some will be setup on a per-model basis
       options: Object.assign({
-        url: 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl',
-        dir: '/gfs.<%= runTime.format(\'YYYYMMDDHH\') %>',
-        file: 'gfs.t<%= runTime.format(\'HH\') %>z.pgrb2full.0p50.f<%= (timeOffset / 3600).toString().padStart(3, \'0\') %>',
-        subregion: null,
-        '<%= name %>': 'on',
-        '<%= level %>': 'on'
+        url: 'https://geoservices.meteofrance.fr/services/MF-NWP-GLOBAL-ARPEGE-05-GLOBE-WCS',
+        version: '2.0.1',
+        token: '__qEMDoIC2ogPRlSoRQLGUBOomaxJyxdEd__',
+        coverageid: '<%= name %>___<%= runTime.format() %>',
+        subsets: Object.assign({
+          time: '<%= forecastTime.format() %>',
+          height: '<%= level %>'
+        }, options.subsets)
       }, options.request)
     },
     hooks: {
       tasks: {
         before: {
           readMongoCollection: {
-            collection: '<%= model %>-<%= element %>', dataPath: 'data.previousData',
+            collection: '<%= model %>-<%= element %>',
+            dataPath: 'data.previousData',
             query: { forecastTime: '<%= forecastTime.format() %>' },
             project: { _id: 1, runTime: 1, forecastTime: 1 }
           },
@@ -58,11 +61,10 @@ module.exports = (options) => {
         },
         after: {
           runCommand: {
-            command: 'weacast-grib2json ./output/<%= id %> -d -o ./output/<%= id %>.json'
+            command: 'weacast-gtiff2json ./output/<%= id %> -o ./output/<%= id %>.json'
           },
           // This will add grid data in a data field
           readJson: {
-            objectPath: '[0].data',
             key: '<%= id %>.json'
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data'] },
@@ -75,7 +77,7 @@ module.exports = (options) => {
           createStores: [{
             id: 'fs',
             options: {
-              path: path.join(__dirname, 'output')
+              path: path.join(__dirname, 'forecast-data')
             }
           }],
           connectMongo: {
@@ -107,4 +109,3 @@ module.exports = (options) => {
     }
   }
 }
-

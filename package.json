@@ -4,29 +4,62 @@
   "version": "0.1.0",
   "homepage": "https://github.com/weacast/weacast-loader",
   "keywords": [
-    "krawler",
-    "feathers",
-    "arpege",
-    "gis"
+    "weacast",
+    "weacast-plugin"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/weacast/weacast-loader.git"
   },
   "author": {
-    "name": "Kalisio",
-    "url": "https://github.com/kalisio"
+    "name": "Weacast contributors",
+    "url": "https://github.com/weacast"
   },
   "contributors": [],
   "bugs": {
     "url": "https://github.com/weacast/weacast-loader/issues"
   },
-  "scripts": {
-    "test": "echo \"Warning: no test specified\"",
-    "release:patch": "npm version --no-git-tag-version --force patch",
-    "release:minor": "npm version --no-git-tag-version --force minor",
-    "release:major": "npm version --no-git-tag-version --force major"
+  "engines": {
+    "node": ">= 4.6.0"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "scripts": {
+    "publish": "git push origin --tags && npm run changelog && git push origin",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
+    "changelog": "github_changelog_generator -u weacast -p weacast-loader && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
+    "lint": "standard *.js test/**/*.js --fix",
+    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --opts mocha.opts",
+    "coverage": "cross-env NODE_CONFIG_DIR=./test/config/ node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --opts mocha.opts",
+    "test": "npm run lint && npm run coverage"
+  },
+  "standard": {
+    "sourceType": "module",
+    "env": [
+      "mocha"
+    ]
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.0.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^3.5.0",
+    "chai-lint": "^0.1.1",
+    "cross-env": "^4.0.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^3.2.0",
+    "nock": "^9.3.2",
+    "shx": "^0.2.2",
+    "standard": "^10.0.2"
+  },
+  "peerDependencies": {
+    "weacast-grib2json": "^0.2.2",
+    "weacast-gtiff2json": "^0.2.0"
+  }
 }
