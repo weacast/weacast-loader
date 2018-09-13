@@ -10,25 +10,17 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-arpege.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-arpege/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-gfs.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-gfs/)
 
-[Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System).
+[Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System) roduced by the National Centers for Environmental Prediction (NCEP).
 
-These data are then visualized using the [Weacast client](https://github.com/weacast/weacast-client).
+These data are then served using the [Weacast services API](https://github.com/weacast/weacast-core) and visualized using the [Weacast client](https://github.com/weacast/weacast-client).
 
-First you need to build the Docker containers containing the ARPEGE, AROME and GFS services (this repo dir):
-```
-# Manually
-docker build -t weacast/weacast-arpege -f dockerfile.arpege .
-docker build -t weacast/weacast-gfs -f dockerfile.gfs .
-docker build -t weacast/weacast-gfs -f dockerfile.gfs .
-# Using Weacast Docker compose files
-docker-compose build weacast-arpege weacast-arome weacast-gfs
-```
+## Documentation
 
-Then you have run it using the Docker compose files (weacast application repo dir):
-```
-# Stop/remove previous instances if any
-docker-compose stop weacast-arpege weacast-arome weacast-gfs
-docker-compose rm weacast-arpege weacast-arome weacast-gfs
-# Launch new ones
-docker-compose up -d weacast-arpege weacast-arome weacast-gfs
-```
+The [Weacast docs](https://weacast.gitbooks.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
+
+## License
+
+Copyright (c) 2017
+
+Licensed under the [MIT license](LICENSE).
+
