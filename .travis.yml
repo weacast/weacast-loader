@@ -24,6 +24,7 @@ before_script:
 - "$JAVA_HOME/bin/java -version"
 - npm install -g weacast-gtiff2json@0.2.1
 - npm install -g weacast-grib2json@0.2.3
+- git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
 - bash travis.build.sh

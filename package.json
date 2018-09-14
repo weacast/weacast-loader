@@ -58,8 +58,7 @@
     "shx": "^0.2.2",
     "standard": "^10.0.2",
     "fs-extra": "^4.0.2",
-    "mongodb": "^3.0.10",
-    "@kalisio/krawler": "https://github.com/kalisio/krawler"
+    "mongodb": "^3.0.10"
   },
   "peerDependencies": {
     "weacast-grib2json": "^0.2.3",
