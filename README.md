@@ -10,7 +10,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-arpege.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-arpege/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-gfs.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-gfs/)
 
-[Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System) roduced by the National Centers for Environmental Prediction (NCEP).
+[Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System) produced by the National Centers for Environmental Prediction (NCEP).
 
 These data are then served using the [Weacast services API](https://github.com/weacast/weacast-core) and visualized using the [Weacast client](https://github.com/weacast/weacast-client).
 
