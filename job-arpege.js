@@ -4,7 +4,7 @@ const outputPath = path.join(__dirname, 'forecast-data')
 const defaults = {
   id: 'weacast-arpege',
   model: 'arpege',
-  dbUrl: 'mongodb://127.0.0.1:27017/weacast',
+  dbUrl: process.env.DB_URL || 'mongodb://127.0.0.1:27017/weacast',
   request: {},
   subsets: {},
   nwp: {},
@@ -72,7 +72,8 @@ module.exports = (options) => {
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data'] },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           writeMongoCollection: { dataPath: 'result', collection: '<%= model %>-<%= element %>', transform: { omit: ['id', 'model', 'element'] } },
-          clearData: { dataPath: 'result.data' } // This will free memory for grid data
+          clearData: { dataPath: 'result.data' }, // This will free memory for grid data
+          emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] }
         }
       },
       jobs: {

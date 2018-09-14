@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  weacast-arpege-world:
+    build:
+      context: .
+      dockerfile: dockerfile.arpege-world
+    container_name: weacast-arpege-world
+    image: weacast/weacast-arpege-world
+    links:
+      - mongodb-weacast:mongodb
+    networks:
+      - weacast
+    environment:
+      - DB_URL=mongodb://mongodb:27017/weacast
+  weacast-arpege-europe:
+    build:
+      context: .
+      dockerfile: dockerfile.arpege-europe
+    container_name: weacast-arpege-europe
+    image: weacast/weacast-arpege-europe
+    links:
+      - mongodb-weacast:mongodb
+    networks:
+      - weacast
+    environment:
+      - DB_URL=mongodb://mongodb:27017/weacast
+  mongodb-weacast:
+    container_name: mongodb-weacast
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_weacast:/data/db
+    networks:
+      - weacast
+
+volumes:
+  mongodb_weacast:
+
+networks:
+  weacast:
