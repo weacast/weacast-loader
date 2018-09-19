@@ -25,6 +25,30 @@ services:
       - weacast
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
+  weacast-arome-france:
+    build:
+      context: .
+      dockerfile: dockerfile.arome-europe
+    container_name: weacast-arome-europe
+    image: weacast/weacast-arome-europe
+    links:
+      - mongodb-weacast:mongodb
+    networks:
+      - weacast
+    environment:
+      - DB_URL=mongodb://mongodb:27017/weacast
+  weacast-gfs-world:
+    build:
+      context: .
+      dockerfile: dockerfile.gfs-world
+    container_name: weacast-gfs-world
+    image: weacast/weacast-gfs-world
+    links:
+      - mongodb-weacast:mongodb
+    networks:
+      - weacast
+    environment:
+      - DB_URL=mongodb://mongodb:27017/weacast
   mongodb-weacast:
     container_name: mongodb-weacast
     image: mongo
