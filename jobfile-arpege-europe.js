@@ -15,7 +15,7 @@ module.exports = createJob({
     runInterval: 6 * 3600,            // Produced every 6h
     interval: 1 * 3600,               // Steps of 1h
     lowerLimit: 0,                    // From T0
-    //upperLimit: 3 * 3600,             // Up to T0 + 3h for testing
+    // upperLimit: 3 * 3600,             // Up to T0 + 3h for testing
     upperLimit: 102 * 3600            // Up to T0+102
   }
 })
