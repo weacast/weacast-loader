@@ -14,3 +14,5 @@ yarn-error.log*
 # Node modules
 node_modules
 
+# Test data
+forecast-data

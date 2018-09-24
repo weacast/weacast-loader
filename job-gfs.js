@@ -67,9 +67,9 @@ module.exports = (options) => {
             objectPath: '[0].data',
             key: '<%= id %>.json'
           },
-          transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data'] },
+          transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
-          writeMongoCollection: { dataPath: 'result', collection: '<%= model %>-<%= element %>', transform: { omit: ['id', 'model', 'element'] } },
+          writeMongoCollection: { dataPath: 'result', collection: '<%= model %>-<%= element %>', transform: { omit: ['id', 'model', 'element', 'client'] } },
           clearData: {}, // This will free memory for grid data
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] }
         }
