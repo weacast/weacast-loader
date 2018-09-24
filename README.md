@@ -6,7 +6,6 @@
 [![Dependency Status](https://img.shields.io/david/weacast/weacast-loader.svg?style=flat-square)](https://david-dm.org/weacast/weacast-loader)
 [![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.gitbooks.io/weacast-docs/api/)
 [![Known Vulnerabilities](https://snyk.io/test/github/weacast/weacast-loader/badge.svg)](https://snyk.io/test/github/weacast/weacast-loader)
-[![Download Status](https://img.shields.io/npm/dm/weacast-loader.svg?style=flat-square)](https://www.npmjs.com/package/weacast-loader)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-arpege.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-arpege/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-gfs.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-gfs/)
 
