@@ -56,7 +56,12 @@ module.exports = (options) => {
             project: { _id: 1, runTime: 1, forecastTime: 1 }
           },
           // Do not download data if already here
-          discardIf: { 'previousData.runTime': '<%= runTime.format() %>' }
+          discardIf: { 'previousData.runTime': '<%= runTime.format() %>' },
+          // Erase previous data if any
+          deleteMongoCollection: {
+            collection: '<%= model %>-<%= element %>',
+            filter: { forecastTime: '<%= forecastTime.format() %>' }
+          }
         },
         after: {
           runCommand: {
