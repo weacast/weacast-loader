@@ -29,7 +29,7 @@ module.exports = (options) => {
     id: options.id,
     store: 'fs',
     options: {
-      workersLimit: 4,
+      workersLimit: options.workersLimit || 2,
       faultTolerant: true
     },
     taskTemplate: {
