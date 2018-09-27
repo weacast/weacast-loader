@@ -5,5 +5,5 @@ MAINTAINER Kalisio <contact@kalisio.xyz>
 COPY jobfile-arpege-world.js .
 
 # For dev testing
-CMD node ./krawler --cron "0 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arpege-world.js
-# CMD krawler --cron "0 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arpege-world.js
+CMD node ./krawler --cron "15 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arpege-world.js
+# CMD krawler --cron "15 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arpege-world.js
