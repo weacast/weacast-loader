@@ -6,5 +6,5 @@ COPY job-arome.js .
 COPY jobfile-arome-france.js .
 
 # For dev testing
-CMD node ./krawler --cron "45 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arome-france.js
-# CMD krawler --cron "45 */15 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arome-france.js
+CMD node ./krawler --cron "0 20,50 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arome-france.js
+# CMD krawler --cron "0 20,50 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arome-france.js
