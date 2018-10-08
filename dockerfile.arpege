@@ -2,15 +2,14 @@ FROM  node:8
 
 MAINTAINER Kalisio <contact@kalisio.xyz>
 
-ENV DEBUG=
+ARG KRAWLER_BRANCH
+ENV KRAWLER_BRANCH=$KRAWLER_BRANCH
 
 RUN mkdir /home/node/.npm-global
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 RUN npm install -g weacast-gtiff2json@0.2.1 --unsafe
-# For dev testing
-RUN git clone https://github.com/kalisio/krawler.git -b master --single-branch && cd krawler && yarn install && cd ..
-# RUN npm install -g kalisio/krawler@0.7.0 --unsafe
+RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single-branch && cd krawler && yarn install && cd ..
 
 COPY job-arpege.js .
