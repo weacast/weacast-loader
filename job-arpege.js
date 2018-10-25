@@ -20,6 +20,11 @@ const defaults = {
     element: 'gust',
     name: 'WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 10 ]
+  }, {
+    element: 'precipitations',
+    name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
+    lowerLimit: 3 * 3600, // Accumulation from T to T-3H
+    accumulationPeriod: 3 * 3600
   }]
 }
 
@@ -44,6 +49,8 @@ module.exports = (options) => {
         token: '__qEMDoIC2ogPRlSoRQLGUBOomaxJyxdEd__',
         coverageid: '<%= name %>___<%= runTime.format() %>',
         subsets: Object.assign({
+          long: [options.bounds[0], options.bounds[1]],
+          lat: [options.bounds[1], options.bounds[2]],
           time: '<%= forecastTime.format() %>',
           height: '<%= level %>'
         }, options.subsets)
@@ -76,9 +83,19 @@ module.exports = (options) => {
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
-          writeMongoCollection: { dataPath: 'result', collection: '<%= model %>-<%= element %>', transform: { omit: ['id', 'model', 'element', 'client'] } },
-          clearData: {}, // This will free memory for grid data
-          emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] }
+          writeRawData: { hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+            transform: { omit: ['id', 'model', 'element', 'client'] } },
+          emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
+          tileGrid: {
+            dataPath: 'result.data',
+            input: { bounds: options.bounds, origin: options.origin, size: options.size, resolution: options.resolution },
+            output: { resolution: options.tileResolution },
+            transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
+          },
+          writeTiles: { hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+            transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
+          },
+          clearData: {} // This will free memory for grid data
         }
       },
       jobs: {
@@ -97,13 +114,13 @@ module.exports = (options) => {
           parallel: options.elements.map(item => ({
             hook: 'createMongoCollection',
             collection: `${options.model}-${item.element}`,
-            index: [{ forecastTime: 1 }, { expireAfterSeconds: options.nwp.interval }],
+            index: [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           })),
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
-            runIndex: -1, // -1 is not current run but previous one to ensure it is already available
+            runIndex: 0, // -1 is not current run but previous one to ensure it is already available
             elements: options.elements.map(element => Object.assign({ model: options.model }, element))
           }, options.nwp)
         },

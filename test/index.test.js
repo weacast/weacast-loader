@@ -21,6 +21,9 @@ function updateJobOptions (job, element) {
     upperLimit: nwpOptions.lowerLimit + nwpOptions.interval,
     elements: [element]
   })
+  afterHooks = job.hooks.tasks.after
+  let bounds = afterHooks.tileGrid.input.bounds
+  afterHooks.tileGrid.output.resolution = [ 0.5 * (bounds[2] - bounds[0]), 0.5 * (bounds[3] - bounds[1]) ]
   return job
 }
 
@@ -52,6 +55,70 @@ describe('weacast-loader', () => {
     levels: [ 'lev_surface' ]
   })
 
+  function expectFiles(model, element, level, present) {
+    // Check intermediate products have been produced and final product are here
+    expect(fs.existsSync(path.join(outputPath, model, element, level, '0'))).to.equal(present)
+    expect(fs.existsSync(path.join(outputPath, model, element, level, '3'))).to.equal(present)
+    expect(fs.existsSync(path.join(outputPath, model, element, level, '0.json'))).to.equal(present)
+    expect(fs.existsSync(path.join(outputPath, model, element, level, '3.json'))).to.equal(present)
+  }
+
+  async function expectResults(collectionName) {
+    const collection = db.collection(collectionName)
+    let results = await collection.find({ geometry: { $exists: false } }).toArray()
+    expect(results.length).to.equal(2)
+    expect(results[0].runTime).toExist()
+    expect(results[0].runTime.toISOString).toExist()
+    expect(results[0].forecastTime).toExist()
+    expect(results[0].forecastTime.toISOString).toExist()
+    expect(results[0].minValue).toExist()
+    expect(typeof results[0].minValue === 'number').toExist()
+    expect(results[0].maxValue).toExist()
+    expect(typeof results[0].maxValue === 'number').toExist()
+    expect(results[0].data).toExist()
+    expect(Array.isArray(results[0].data)).beTrue()
+    expect(typeof results[0].data[0] === 'number').toExist()
+  }
+
+  async function expectTileResults(collectionName) {
+    const collection = db.collection(collectionName)
+    let results = await collection.find({ geometry: { $exists: true } }).toArray()
+    expect(results.length).to.equal(2 * 4)
+    expect(results[0].runTime).toExist()
+    expect(results[0].runTime.toISOString).toExist()
+    expect(results[0].forecastTime).toExist()
+    expect(results[0].forecastTime.toISOString).toExist()
+    /* Not yet done
+    expect(results[0].minValue).toExist()
+    expect(typeof results[0].minValue === 'number').toExist()
+    expect(results[0].maxValue).toExist()
+    expect(typeof results[0].maxValue === 'number').toExist()
+    */
+    expect(results[0].x).toExist()
+    expect(typeof results[0].x === 'number').toExist()
+    expect(results[0].y).toExist()
+    expect(typeof results[0].y === 'number').toExist()
+    expect(results[0].bounds).toExist()
+    expect(Array.isArray(results[0].bounds)).toExist()
+    expect(typeof results[0].bounds[0] === 'number').toExist()
+    expect(results[0].origin).toExist()
+    expect(Array.isArray(results[0].origin)).toExist()
+    expect(typeof results[0].origin[0] === 'number').toExist()
+    expect(results[0].size).toExist()
+    expect(Array.isArray(results[0].size)).toExist()
+    expect(typeof results[0].size[0] === 'number').toExist()
+    expect(results[0].resolution).toExist()
+    expect(Array.isArray(results[0].resolution)).toExist()
+    expect(typeof results[0].resolution[0] === 'number').toExist()
+    expect(results[0].geometry).toExist()
+    expect(typeof results[0].geometry === 'object').toExist()
+    expect(results[0].timeseries).toExist()
+    expect(typeof results[0].timeseries === 'boolean').toExist()
+    expect(results[0].data).toExist()
+    expect(Array.isArray(results[0].data)).beTrue()
+    expect(typeof results[0].data[0] === 'number').toExist()
+  }
+
   before(async () => {
     chailint(chai, util)
 
@@ -69,19 +136,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '0'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '3'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '0.json'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '3.json'))).beTrue()
-    const collection = db.collection('arpege-world-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arpege-world', 'temperature', '2', true)
+    await expectResults('arpege-world-temperature')
+    // Tiles
+    await expectTileResults('arpege-world-temperature')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -91,19 +149,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '0'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '3'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '0.json'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-world', 'temperature', '2', '3.json'))).beFalse()
-    const collection = db.collection('arpege-world-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arpege-world', 'temperature', '2', false)
+    await expectResults('arpege-world-temperature')
+    // Tiles
+    await expectTileResults('arpege-world-temperature')
   })
   // Let enough time to process
   .timeout(10000)
@@ -112,19 +161,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '0'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '1'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '0.json'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '1.json'))).beTrue()
-    const collection = db.collection('arpege-europe-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arpege-europe', 'temperature', '2', true)
+    await expectResults('arpege-europe-temperature')
+    // Tiles
+    await expectTileResults('arpege-europe-temperature')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -134,19 +174,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '0'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '1'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '0.json'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arpege-europe', 'temperature', '2', '1.json'))).beFalse()
-    const collection = db.collection('arpege-europe-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arpege-europe', 'temperature', '2', false)
+    await expectResults('arpege-europe-temperature')
+    // Tiles
+    await expectTileResults('arpege-europe-temperature')
   })
   // Let enough time to process
   .timeout(10000)
@@ -155,19 +186,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '0'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '1'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '0.json'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '1.json'))).beTrue()
-    const collection = db.collection('arome-france-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arome-france', 'temperature', '2', true)
+    await expectResults('arome-france-temperature')
+    // Tiles
+    await expectTileResults('arome-france-temperature')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -177,19 +199,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '0'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '1'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '0.json'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'arome-france', 'temperature', '2', '1.json'))).beFalse()
-    const collection = db.collection('arome-france-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('arome-france', 'temperature', '2', false)
+    await expectResults('arome-france-temperature')
+    // Tiles
+    await expectTileResults('arome-france-temperature')
   })
   // Let enough time to process
   .timeout(10000)
@@ -198,19 +211,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(gfsWorldJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '0'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '3'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '0.json'))).beTrue()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '3.json'))).beTrue()
-    const collection = db.collection('gfs-world-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('gfs-world', 'temperature', 'surface', true)
+    await expectResults('gfs-world-temperature')
+    // Tiles
+    await expectTileResults('gfs-world-temperature')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -220,19 +224,10 @@ describe('weacast-loader', () => {
     const tasks = await krawler(gfsWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '0'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '3'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '0.json'))).beFalse()
-    expect(fs.existsSync(path.join(outputPath, 'gfs-world', 'temperature', 'surface', '3.json'))).beFalse()
-    const collection = db.collection('gfs-world-temperature')
-    const results = await collection.find({}).toArray()
-    expect(results.length).to.equal(2)
-    expect(results[0].runTime).toExist()
-    expect(results[0].forecastTime).toExist()
-    expect(results[0].minValue).toExist()
-    expect(results[0].maxValue).toExist()
-    expect(results[0].data).toExist()
-    expect(Array.isArray(results[0].data)).beTrue()
+    expectFiles('gfs-world', 'temperature', 'surface', false)
+    await expectResults('gfs-world-temperature')
+    // Tiles
+    await expectTileResults('gfs-world-temperature')
   })
   // Let enough time to process
   .timeout(10000)
