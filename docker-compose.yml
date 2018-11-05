@@ -13,6 +13,7 @@ services:
       - weacast
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
+      - METEO_FRANCE_TOKEN
   weacast-arpege-europe:
     build:
       context: .
@@ -25,6 +26,7 @@ services:
       - weacast
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
+      - METEO_FRANCE_TOKEN
   weacast-arome-france:
     build:
       context: .
@@ -37,6 +39,7 @@ services:
       - weacast
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
+      - METEO_FRANCE_TOKEN
   weacast-gfs-world:
     build:
       context: .
