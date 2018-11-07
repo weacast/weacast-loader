@@ -84,7 +84,11 @@ module.exports = (options) => {
           // We unify everything to 3H accumulation period.
           apply: {
             match: { element: 'precipitations', predicate: (item) => item.forecastTime.hours() % 6 === 0 },
-            function: (item) => { for (let i = 0; i < item.data.length; i++) item.data[i] = 0.5 * item.data[i] }
+            function: (item) => {
+              for (let i = 0; i < item.data.length; i++) {
+                item.data[i] = 0.5 * item.data[i]
+              }
+            }
           },
           // Erase previous data if any
           deleteMongoCollection: {
