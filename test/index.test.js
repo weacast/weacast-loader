@@ -55,12 +55,12 @@ describe('weacast-loader', () => {
     levels: [ 'lev_surface' ]
   })
 
-  function expectFiles(model, element, level, present) {
+  function expectFiles(model, element, level, interval, present) {
     // Check intermediate products have been produced and final product are here
     expect(fs.existsSync(path.join(outputPath, model, element, level, '0'))).to.equal(present)
-    expect(fs.existsSync(path.join(outputPath, model, element, level, '3'))).to.equal(present)
+    expect(fs.existsSync(path.join(outputPath, model, element, level, interval))).to.equal(present)
     expect(fs.existsSync(path.join(outputPath, model, element, level, '0.json'))).to.equal(present)
-    expect(fs.existsSync(path.join(outputPath, model, element, level, '3.json'))).to.equal(present)
+    expect(fs.existsSync(path.join(outputPath, model, element, level, interval + '.json'))).to.equal(present)
   }
 
   async function expectResults(collectionName) {
@@ -136,7 +136,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expectFiles('arpege-world', 'temperature', '2', true)
+    expectFiles('arpege-world', 'temperature', '2', 3, true)
     await expectResults('arpege-world-temperature')
     // Tiles
     await expectTileResults('arpege-world-temperature')
@@ -149,7 +149,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expectFiles('arpege-world', 'temperature', '2', false)
+    expectFiles('arpege-world', 'temperature', '2', 3, false)
     await expectResults('arpege-world-temperature')
     // Tiles
     await expectTileResults('arpege-world-temperature')
@@ -161,7 +161,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expectFiles('arpege-europe', 'temperature', '2', true)
+    expectFiles('arpege-europe', 'temperature', '2', 1, true)
     await expectResults('arpege-europe-temperature')
     // Tiles
     await expectTileResults('arpege-europe-temperature')
@@ -174,7 +174,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expectFiles('arpege-europe', 'temperature', '2', false)
+    expectFiles('arpege-europe', 'temperature', '2', 1, false)
     await expectResults('arpege-europe-temperature')
     // Tiles
     await expectTileResults('arpege-europe-temperature')
@@ -186,7 +186,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expectFiles('arome-france', 'temperature', '2', true)
+    expectFiles('arome-france', 'temperature', '2', 1, true)
     await expectResults('arome-france-temperature')
     // Tiles
     await expectTileResults('arome-france-temperature')
@@ -199,7 +199,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expectFiles('arome-france', 'temperature', '2', false)
+    expectFiles('arome-france', 'temperature', '2', 1, false)
     await expectResults('arome-france-temperature')
     // Tiles
     await expectTileResults('arome-france-temperature')
@@ -211,7 +211,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(gfsWorldJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
-    expectFiles('gfs-world', 'temperature', 'surface', true)
+    expectFiles('gfs-world', 'temperature', 'surface', 3, true)
     await expectResults('gfs-world-temperature')
     // Tiles
     await expectTileResults('gfs-world-temperature')
@@ -224,7 +224,7 @@ describe('weacast-loader', () => {
     const tasks = await krawler(gfsWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
-    expectFiles('gfs-world', 'temperature', 'surface', false)
+    expectFiles('gfs-world', 'temperature', 'surface', 3, false)
     await expectResults('gfs-world-temperature')
     // Tiles
     await expectTileResults('gfs-world-temperature')
