@@ -13,18 +13,17 @@ const defaults = {
     name: 'U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 10 ]
   }, {
-    element: 'v-wind',
-    name: 'V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
-    levels: [ 10 ]
-  }, {
     element: 'gust',
     name: 'WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 10 ]
   }, {
+    element: 'v-wind',
+    name: 'V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
+    levels: [ 10 ]
+  }, {
     element: 'precipitations',
     name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
-    lowerLimit: 3 * 3600, // Accumulation from T to T-3H
-    accumulationPeriod: 3 * 3600
+    lowerLimit: 3 * 3600 // Accumulation from T to T-3H
   }]
 }
 
@@ -49,8 +48,8 @@ module.exports = (options) => {
         token: process.env.METEO_FRANCE_TOKEN || '__qEMDoIC2ogPRlSoRQLGUBOomaxJyxdEd__',
         coverageid: '<%= name %>___<%= runTime.format() %>',
         subsets: Object.assign({
-          long: [options.bounds[0], options.bounds[1]],
-          lat: [options.bounds[1], options.bounds[2]],
+          long: [options.bounds[0], options.bounds[2]],
+          lat: [options.bounds[1], options.bounds[3]],
           time: '<%= forecastTime.format() %>',
           height: '<%= level %>'
         }, options.subsets)
@@ -62,15 +61,21 @@ module.exports = (options) => {
           readMongoCollection: {
             collection: '<%= model %>-<%= element %>',
             dataPath: 'data.previousData',
-            query: { forecastTime: '<%= forecastTime.format() %>' },
-            project: { _id: 1, runTime: 1, forecastTime: 1 }
+            query: { forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
+            project: { _id: 1, runTime: 1, forecastTime: 1 },
+            transform: { asObject: true }
           },
           // Do not download data if already here
-          discardIf: { 'previousData.runTime': '<%= runTime.format() %>' },
-          // Erase previous data if any
-          deleteMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
-            filter: { forecastTime: '<%= forecastTime.format() %>' }
+          discardIf: { predicate: (item) => item.previousData.runTime && (item.runTime.valueOf() === item.previousData.runTime.getTime()) },
+          // When the accumulation period X is less than 1 day suffix is PTXH otherwise the suffix is PXD.
+          apply: {
+            match: { element: 'precipitations' },
+            function: (item) => {
+              var accumulationPeriod = item.lowerLimit / 3600
+              if (accumulationPeriod < 24) item.options.coverageid += '_PT' + accumulationPeriod + 'H'
+              else item.options.coverageid += '_P' + (accumulationPeriod / 24) + 'D'
+              delete item.options.subsets.height
+            }
           }
         },
         after: {
@@ -83,16 +88,23 @@ module.exports = (options) => {
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
+          // Erase previous data if any
+          deleteMongoCollection: {
+            collection: '<%= model %>-<%= element %>',
+            filter: { forecastTime: '<%= forecastTime.format() %>' }
+          },
           writeRawData: { hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
             transform: { omit: ['id', 'model', 'element', 'client'] } },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
+            match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',
             input: { bounds: options.bounds, origin: options.origin, size: options.size, resolution: options.resolution },
             output: { resolution: options.tileResolution },
             transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
           },
           writeTiles: { hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+            match: { predicate: (item) => options.tileResolution },
             transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
           },
           clearData: {} // This will free memory for grid data

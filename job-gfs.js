@@ -12,13 +12,13 @@ const defaults = {
     name: 'var_UGRD',
     levels: [ 'lev_10_m_above_ground' ]
   }, {
-    element: 'v-wind',
-    name: 'var_VGRD',
-    levels: [ 'lev_10_m_above_ground' ]
-  }, {
     element: 'gust',
     name: 'var_GUST',
     levels: [ 'lev_surface' ]
+  }, {
+    element: 'v-wind',
+    name: 'var_VGRD',
+    levels: [ 'lev_10_m_above_ground' ]
   }, {
     element: 'precipitations',
     name: 'var_APCP',
@@ -61,16 +61,12 @@ module.exports = (options) => {
           readMongoCollection: {
             collection: '<%= model %>-<%= element %>',
             dataPath: 'data.previousData',
-            query: { forecastTime: '<%= forecastTime.format() %>' },
-            project: { _id: 1, runTime: 1, forecastTime: 1 }
+            query: { forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
+            project: { _id: 1, runTime: 1, forecastTime: 1 },
+            transform: { asObject: true }
           },
           // Do not download data if already here
-          discardIf: { 'previousData.runTime': '<%= runTime.format() %>' },
-          // Erase previous data if any
-          deleteMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
-            filter: { forecastTime: '<%= forecastTime.format() %>' }
-          }
+          discardIf: { predicate: (item) => item.previousData.runTime && (item.runTime.valueOf() === item.previousData.runTime.getTime()) }
         },
         after: {
           runCommand: {
@@ -83,16 +79,30 @@ module.exports = (options) => {
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
+          // For forecast hours evenly divisible by 6, the accumulation period is from T-6h to T,
+          // while for other forecast hours (divisible by 3 but not 6) it is from T-3h to T.
+          // We unify everything to 3H accumulation period.
+          apply: {
+            match: { element: 'precipitations', predicate: (item) => item.forecastTime.hours() % 6 === 0 },
+            function: (item) => { for (let i = 0; i < item.data.length; i++) item.data[i] = 0.5 * item.data[i] }
+          },
+          // Erase previous data if any
+          deleteMongoCollection: {
+            collection: '<%= model %>-<%= element %>',
+            filter: { forecastTime: '<%= forecastTime.format() %>' }
+          },
           writeRawData: { hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
             transform: { omit: ['id', 'model', 'element', 'client'] } },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
+            match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',
             input: { bounds: options.bounds, origin: options.origin, size: options.size, resolution: options.resolution },
             output: { resolution: options.tileResolution },
             transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
           },
           writeTiles: { hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+            match: { predicate: (item) => options.tileResolution },
             transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
           },
           clearData: {} // This will free memory for grid data
@@ -100,12 +110,12 @@ module.exports = (options) => {
       },
       jobs: {
         before: {
-          createStores: [{
+          createStores: {
             id: 'fs',
             options: {
               path: outputPath
             }
-          }],
+          },
           connectMongo: {
             url: options.dbUrl,
             // Required so that client is forwarded from job to tasks

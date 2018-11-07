@@ -11,7 +11,7 @@ module.exports = createJob({
   tileResolution: [20, 20],
   nwp: {
     runInterval: 6 * 3600,          // Produced every 6h
-    oldestRunInterval: 24 * 3600,     // Don't go back in time older than 1 day
+    oldestRunInterval: 24 * 3600,   // Don't go back in time older than 1 day
     interval: 3 * 3600,             // Steps of 3h
     lowerLimit: 0 * 3600,           // From T0
     // upperLimit: 3 * 3600,           // Up to T0 + 3h for testing
