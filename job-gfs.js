@@ -128,7 +128,7 @@ module.exports = (options) => {
           parallel: options.elements.map(item => ({
             hook: 'createMongoCollection',
             collection: `${options.model}-${item.element}`,
-            index: [
+            indices: [
               { x: 1, y: 1 },
               { geometry: '2dsphere' },
               [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
