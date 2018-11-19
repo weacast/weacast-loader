@@ -128,7 +128,11 @@ module.exports = (options) => {
           parallel: options.elements.map(item => ({
             hook: 'createMongoCollection',
             collection: `${options.model}-${item.element}`,
-            index: [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
+            index: [
+              { x: 1, y: 1 },
+              { geometry: '2dsphere' },
+              [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
+            ],
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           })),
