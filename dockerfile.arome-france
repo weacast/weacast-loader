@@ -2,7 +2,10 @@ FROM  weacast/weacast-arpege
 
 MAINTAINER Kalisio <contact@kalisio.xyz>
 
+ARG SYNC_DB_URL=mongodb://mongodb:27017/weacast
+ENV SYNC_DB_URL=$SYNC_DB_URL
+
 COPY job-arome.js .
 COPY jobfile-arome-france.js .
 
-CMD node ./krawler --cron "0 20,50 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-arome-france.js
+CMD node ./krawler --cron "0 20,50 * * * *" --sync "$SYNC_DB_URL" jobfile-arome-france.js

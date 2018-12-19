@@ -2,6 +2,9 @@ FROM  weacast/weacast-gfs
 
 MAINTAINER Kalisio <contact@kalisio.xyz>
 
+ARG SYNC_DB_URL=mongodb://mongodb:27017/weacast
+ENV SYNC_DB_URL=$SYNC_DB_URL
+
 COPY jobfile-gfs-world.js .
 
-CMD node ./krawler --cron "0 0,30 * * * *" --sync "mongodb://mongodb:27017/weacast" jobfile-gfs-world.js
+CMD node ./krawler --cron "0 0,30 * * * *" --sync "$SYNC_DB_URL" jobfile-gfs-world.js
