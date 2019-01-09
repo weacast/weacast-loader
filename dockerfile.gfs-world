@@ -1,4 +1,5 @@
-FROM  weacast/weacast-gfs
+ARG TAG=latest
+FROM  weacast/weacast-gfs:${TAG}
 
 MAINTAINER Kalisio <contact@kalisio.xyz>
 
