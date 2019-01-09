@@ -145,7 +145,7 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(30000)
 
-  it('run ARPEGE WORLD dowloader once again', async () => {
+  it('run ARPEGE WORLD downloader once again', async () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
@@ -157,7 +157,7 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(10000)
 
-  it('run ARPEGE EUROPE dowloader', async () => {
+  it('run ARPEGE EUROPE downloader', async () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
@@ -170,7 +170,7 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(30000)
 
-  it('run ARPEGE EUROPE dowloader once again', async () => {
+  it('run ARPEGE EUROPE downloader once again', async () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
@@ -182,7 +182,7 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(10000)
 
-  it('run AROME FRANCE dowloader', async () => {
+  it('run AROME FRANCE downloader', async () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
@@ -195,7 +195,7 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(30000)
 
-  it('run AROME FRANCE dowloader once again', async () => {
+  it('run AROME FRANCE downloader once again', async () => {
     const tasks = await krawler(aromeFranceJob)
     expect(tasks.length).to.equal(2)
     // Check nothing has been produced because DB is already up-to-date
