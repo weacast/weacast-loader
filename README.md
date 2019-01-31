@@ -4,7 +4,7 @@
 [![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
 [![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
 [![Dependency Status](https://img.shields.io/david/weacast/weacast-loader.svg?style=flat-square)](https://david-dm.org/weacast/weacast-loader)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.gitbooks.io/weacast-docs/api/)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast-docs/)
 [![Known Vulnerabilities](https://snyk.io/test/github/weacast/weacast-loader/badge.svg)](https://snyk.io/test/github/weacast/weacast-loader)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-arpege.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-arpege/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/weacast/weacast-gfs.svg?style=plastic)](https://hub.docker.com/r/weacast/weacast-gfs/)
@@ -17,7 +17,7 @@ To debug a loader you can run this command from a local krawler/MongoDB install 
 
 ## Documentation
 
-The [Weacast docs](https://weacast.gitbooks.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
+The [Weacast docs](https://weacast.github.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
 
 ## License
 
