@@ -40,6 +40,19 @@ services:
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
       - METEO_FRANCE_TOKEN
+  weacast-arome-france-high:
+    build:
+      context: .
+      dockerfile: dockerfile.arome-france-high
+    container_name: weacast-arome-france-high
+    image: weacast/weacast-arome-france-high
+    links:
+      - mongodb-weacast:mongodb
+    networks:
+      - weacast
+    environment:
+      - DB_URL=mongodb://mongodb:27017/weacast
+      - METEO_FRANCE_TOKEN
   weacast-gfs-world:
     build:
       context: .

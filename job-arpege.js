@@ -29,6 +29,8 @@ const defaults = {
 
 module.exports = (options) => {
   options = Object.assign(defaults, options)
+  // Forward global data store to elements
+  if (options.dataStore) options.elements.forEach(element => Object.assign(element, { dataStore: options.dataStore }))
 
   return {
     id: options.id,
@@ -66,7 +68,9 @@ module.exports = (options) => {
             transform: { asObject: true }
           },
           // Do not download data if already here
-          discardIf: { predicate: (item) => item.previousData.runTime && (item.runTime.valueOf() === item.previousData.runTime.getTime()) },
+          discardIf: {
+            predicate: (item) => item.previousData.runTime && (item.runTime.valueOf() === item.previousData.runTime.getTime())
+          },
           // When the accumulation period X is less than 1 day suffix is PTXH otherwise the suffix is PXD.
           apply: {
             match: { element: 'precipitations' },
@@ -80,32 +84,57 @@ module.exports = (options) => {
         },
         after: {
           runCommand: {
-            command: `weacast-gtiff2json ${outputPath}/<%= id %> -o ${outputPath}/<%= id %>.json`
+            command: `weacast-gtiff2json ${outputPath}/<%= id %> -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
           },
           // This will add grid data in a data field
           readJson: {
             key: '<%= id %>.json'
           },
-          transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
+          transformJson: {
+            dataPath: 'result',
+            pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'dataStore', 'client']
+          },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // Erase previous data if any
           deleteMongoCollection: {
             collection: '<%= model %>-<%= element %>',
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
-          writeRawData: { hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
-            transform: { omit: ['id', 'model', 'element', 'client'] } },
+          writeRawData: {
+            match: { dataStore: { $ne: 'gridfs' } },
+            hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+            transform: {
+              omit: ['id', 'model', 'element', 'dataStore', 'client']
+            }
+          },
+          writeMetaData: {
+            match: { dataStore: { $eq: 'gridfs' } },
+            hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+            transform: {
+              omit: ['id', 'model', 'element', 'data', 'dataStore', 'client'],
+              merge: { filePath: '<%= id %>', convertedFilePath: '<%= id %>.json' }
+            }
+          },
+          writeRawFile: {
+            match: { dataStore: { $eq: 'gridfs' } },
+            hook: 'writeMongoBucket', key: `<%= id %>.json`, bucket: '<%= model %>-<%= element %>'
+          },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
             match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',
             input: { bounds: options.bounds, origin: options.origin, size: options.size, resolution: options.resolution },
             output: { resolution: options.tileResolution },
-            transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
+            transform: {
+              merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false }
+            }
           },
-          writeTiles: { hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+          writeTiles: {
+            hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
             match: { predicate: (item) => options.tileResolution },
-            transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
+            transform: {
+              unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } }
+            }
           },
           clearData: {} // This will free memory for grid data
         }
@@ -131,6 +160,12 @@ module.exports = (options) => {
               { geometry: '2dsphere' },
               [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
             ],
+            // Required so that client is forwarded from job to tasks
+            clientPath: 'taskTemplate.client'
+          })),
+          parallel: options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
+            hook: 'createMongoBucket',
+            bucket: `${options.model}-${item.element}`,
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           })),
