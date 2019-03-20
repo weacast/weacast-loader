@@ -117,7 +117,8 @@ module.exports = (options) => {
           },
           writeRawFile: {
             match: { dataStore: { $eq: 'gridfs' } },
-            hook: 'writeMongoBucket', key: `<%= id %>.json`, bucket: '<%= model %>-<%= element %>'
+            hook: 'writeMongoBucket', key: `<%= id %>.json`, bucket: '<%= model %>-<%= element %>',
+            metadata: { forecastTime: '<%= forecastTime.format() %>' }
           },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
@@ -152,23 +153,29 @@ module.exports = (options) => {
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           },
-          parallel: options.elements.map(item => ({
-            hook: 'createMongoCollection',
-            collection: `${options.model}-${item.element}`,
-            indices: [
-              { x: 1, y: 1 },
-              { geometry: '2dsphere' },
-              [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
-            ],
-            // Required so that client is forwarded from job to tasks
-            clientPath: 'taskTemplate.client'
-          })),
-          parallel: options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
-            hook: 'createMongoBucket',
-            bucket: `${options.model}-${item.element}`,
-            // Required so that client is forwarded from job to tasks
-            clientPath: 'taskTemplate.client'
-          })),
+          createCollections: {
+            hook: 'parallel',
+            hooks: options.elements.map(item => ({
+              hook: 'createMongoCollection',
+              collection: `${options.model}-${item.element}`,
+              indices: [
+                { x: 1, y: 1 },
+                { geometry: '2dsphere' },
+                [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
+              ],
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))
+          },
+          createBuckets: {
+            hook: 'parallel',
+            hooks: options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
+              hook: 'createMongoBucket',
+              bucket: `${options.model}-${item.element}`,
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))
+          },
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
             runIndex: 0, // -1 is not current run but previous one to ensure it is already available
