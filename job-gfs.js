@@ -131,7 +131,8 @@ module.exports = (options) => {
             indices: [
               { x: 1, y: 1 },
               { geometry: '2dsphere' },
-              [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }]
+              [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
+              { forecastTime: 1, geometry: 1 }
             ],
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
