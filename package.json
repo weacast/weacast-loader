@@ -62,7 +62,7 @@
   },
   "peerDependencies": {
     "@kalisio/krawler": "0.8.0",
-    "weacast-grib2json": "^0.2.3",
-    "weacast-gtiff2json": "^0.2.1"
+    "weacast-grib2json": "^1.0.0",
+    "weacast-gtiff2json": "^1.0.0"
   }
 }

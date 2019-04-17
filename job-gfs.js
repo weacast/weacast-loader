@@ -95,7 +95,9 @@ module.exports = (options) => {
             collection: '<%= model %>-<%= element %>',
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
-          writeRawData: { hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+          writeRawData: { hook: 'writeMongoCollection',
+            dataPath: 'result',
+            collection: '<%= model %>-<%= element %>',
             transform: { omit: ['id', 'model', 'element', 'client'] } },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
@@ -105,7 +107,9 @@ module.exports = (options) => {
             output: { resolution: options.tileResolution },
             transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
           },
-          writeTiles: { hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+          writeTiles: { hook: 'writeMongoCollection',
+            dataPath: 'result.data',
+            collection: '<%= model %>-<%= element %>',
             match: { predicate: (item) => options.tileResolution },
             transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
           },

@@ -9,7 +9,7 @@ RUN mkdir /home/node/.npm-global
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
-RUN npm install -g weacast-gtiff2json@0.2.2 --unsafe
+RUN npm install -g weacast-gtiff2json@1.0.0 --unsafe
 RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single-branch && cd krawler && yarn install && cd ..
 
 COPY job-arpege.js .

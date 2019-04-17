@@ -102,14 +102,18 @@ module.exports = (options) => {
           },
           writeRawData: {
             match: { dataStore: { $ne: 'gridfs' } },
-            hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+            hook: 'writeMongoCollection',
+            dataPath: 'result',
+            collection: '<%= model %>-<%= element %>',
             transform: {
               omit: ['id', 'model', 'element', 'dataStore', 'client']
             }
           },
           writeMetaData: {
             match: { dataStore: { $eq: 'gridfs' } },
-            hook: 'writeMongoCollection', dataPath: 'result', collection: '<%= model %>-<%= element %>',
+            hook: 'writeMongoCollection',
+            dataPath: 'result',
+            collection: '<%= model %>-<%= element %>',
             transform: {
               omit: ['id', 'model', 'element', 'data', 'dataStore', 'client'],
               merge: { filePath: '<%= id %>', convertedFilePath: '<%= id %>.json' }
@@ -117,7 +121,9 @@ module.exports = (options) => {
           },
           writeRawFile: {
             match: { dataStore: { $eq: 'gridfs' } },
-            hook: 'writeMongoBucket', key: `<%= id %>.json`, bucket: '<%= model %>-<%= element %>',
+            hook: 'writeMongoBucket',
+            key: `<%= id %>.json`,
+            bucket: '<%= model %>-<%= element %>',
             metadata: { forecastTime: '<%= forecastTime.format() %>' }
           },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
@@ -131,7 +137,9 @@ module.exports = (options) => {
             }
           },
           writeTiles: {
-            hook: 'writeMongoCollection', dataPath: 'result.data', collection: '<%= model %>-<%= element %>',
+            hook: 'writeMongoCollection',
+            dataPath: 'result.data',
+            collection: '<%= model %>-<%= element %>',
             match: { predicate: (item) => options.tileResolution },
             transform: {
               unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } }
