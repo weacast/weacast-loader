@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.1](https://github.com/weacast/weacast-loader/tree/v1.0.1) (2019-04-17)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.0.0...v1.0.1)
+
+**Fixed bugs:**
+
+- GFS image build is broken [\#7](https://github.com/weacast/weacast-loader/issues/7)
+
 ## [v1.0.0](https://github.com/weacast/weacast-loader/tree/v1.0.0) (2019-04-17)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/dc2e4826ec9e354539f74473ae876e86b5b9c40b...v1.0.0)
