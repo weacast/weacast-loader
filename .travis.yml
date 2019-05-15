@@ -8,7 +8,7 @@ services:
 addons:
   apt:
     packages:
-    - oracle-java8-set-default
+    - oracle-java9-set-default
   code_climate:
     repo_token: 3f30a58b36c68a3e9436795b8a99f2f134a6d884ceb7e055ee7b39589886281d
 notifications:
