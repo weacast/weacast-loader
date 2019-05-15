@@ -13,3 +13,5 @@ RUN npm install -g weacast-gtiff2json@1.0.0 --unsafe
 RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single-branch && cd krawler && yarn install && cd ..
 
 COPY job-arpege.js .
+
+HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node ./healthcheck.js --success-rate 0.75
