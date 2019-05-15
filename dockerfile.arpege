@@ -14,4 +14,4 @@ RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single
 
 COPY job-arpege.js .
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node ./healthcheck.js --success-rate 0.75
+HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node ./krawler/healthcheck.js --success-rate 0.75
