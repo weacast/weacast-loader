@@ -16,7 +16,7 @@ RUN apt-get clean
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 RUN $JAVA_HOME/bin/java -version
 
-RUN npm install -g weacast-grib2json@1.0.0 --unsafe
+RUN npm install -g weacast-grib2json@1.0.1 --unsafe
 RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single-branch && cd krawler && yarn install && cd ..
 
 COPY job-gfs.js .

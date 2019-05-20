@@ -70,7 +70,7 @@ module.exports = (options) => {
         },
         after: {
           runCommand: {
-            command: `weacast-grib2json ${outputPath}/<%= id %> -d -o ${outputPath}/<%= id %>.json`
+            command: `weacast-grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
           },
           // This will add grid data in a data field
           readJson: {

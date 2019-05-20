@@ -22,8 +22,8 @@ before_script:
 - npm install -g codeclimate-test-reporter
 - export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 - "$JAVA_HOME/bin/java -version"
-- npm install -g weacast-gtiff2json@0.2.2
-- npm install -g weacast-grib2json@0.2.3
+- npm install -g weacast-gtiff2json@1.0.0
+- npm install -g weacast-grib2json@1.0.1
 - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
 - yarn link '@kalisio/krawler'
 after_script:
