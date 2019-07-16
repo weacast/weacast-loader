@@ -94,7 +94,7 @@ module.exports = (options) => {
           // For forecast hours evenly divisible by 6, the accumulation period is from T-6h to T,
           // while for other forecast hours (divisible by 3 but not 6) it is from T-3h to T.
           // We unify everything to 3H accumulation period.
-          apply: {
+          normalizePrecipitations: { hook: 'apply',
             match: { element: 'precipitations', predicate: (item) => item.forecastTime.hours() % 6 === 0 },
             function: (item) => {
               for (let i = 0; i < item.data.length; i++) {
@@ -103,7 +103,7 @@ module.exports = (options) => {
             }
           },
           // Convert temperature from K to C°
-          apply: {
+          convertTemperature: { hook: 'apply',
             match: { element: 'temperature' },
             function: (item) => {
               for (let i = 0; i < item.data.length; i++) {
