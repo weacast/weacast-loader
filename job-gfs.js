@@ -24,11 +24,24 @@ const defaults = {
     name: 'var_APCP',
     levels: [ 'lev_surface' ],
     lowerLimit: 3 * 3600 // Accumulation from T to T-3H
+  }, {
+    element: 'temperature',
+    name: 'var_TMP',
+    levels: [ 'lev_surface' ]
   }]
 }
 
 module.exports = (options) => {
   options = Object.assign(defaults, options)
+  const collection = (options.isobaric ?
+    `${options.model}-<%= element %>-<%= level.split('_')[1] %>` : '<%= model %>-<%= element %>')
+  const indices = (item) => [
+    { x: 1, y: 1 },
+    { geometry: 1 },
+    { geometry: '2dsphere' },
+    [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
+    { forecastTime: 1, geometry: 1 }
+  ]
 
   return {
     id: options.id,
@@ -59,7 +72,7 @@ module.exports = (options) => {
       tasks: {
         before: {
           readMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
+            collection,
             dataPath: 'data.previousData',
             query: { forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
             project: { _id: 1, runTime: 1, forecastTime: 1 },
@@ -78,7 +91,6 @@ module.exports = (options) => {
             key: '<%= id %>.json'
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
-          computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // For forecast hours evenly divisible by 6, the accumulation period is from T-6h to T,
           // while for other forecast hours (divisible by 3 but not 6) it is from T-3h to T.
           // We unify everything to 3H accumulation period.
@@ -90,14 +102,24 @@ module.exports = (options) => {
               }
             }
           },
+          // Convert temperature from K to C°
+          apply: {
+            match: { element: 'temperature' },
+            function: (item) => {
+              for (let i = 0; i < item.data.length; i++) {
+                item.data[i] = item.data[i] - 273.15
+              }
+            }
+          },
+          computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // Erase previous data if any
           deleteMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
+            collection,
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
           writeRawData: { hook: 'writeMongoCollection',
             dataPath: 'result',
-            collection: '<%= model %>-<%= element %>',
+            collection,
             transform: { omit: ['id', 'model', 'element', 'client'] } },
           emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
@@ -109,7 +131,7 @@ module.exports = (options) => {
           },
           writeTiles: { hook: 'writeMongoCollection',
             dataPath: 'result.data',
-            collection: '<%= model %>-<%= element %>',
+            collection,
             match: { predicate: (item) => options.tileResolution },
             transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
           },
@@ -129,18 +151,22 @@ module.exports = (options) => {
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           },
-          parallel: options.elements.map(item => ({
-            hook: 'createMongoCollection',
-            collection: `${options.model}-${item.element}`,
-            indices: [
-              { x: 1, y: 1 },
-              { geometry: '2dsphere' },
-              [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
-              { forecastTime: 1, geometry: 1 }
-            ],
-            // Required so that client is forwarded from job to tasks
-            clientPath: 'taskTemplate.client'
-          })),
+          parallel: (options.isobaric ?
+            options.elements.map(item => item.levels.map(level => ({
+              hook: 'createMongoCollection',
+              collection: `${options.model}-${item.element}-${level.split('_')[1]}`,
+              indices: indices(item),
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
+            options.elements.map(item => ({
+              hook: 'createMongoCollection',
+              collection: `${options.model}-${item.element}`,
+              indices: indices(item),
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))
+          ),
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
             runIndex: 0, // -1 is not current run but previous one to ensure it is already available

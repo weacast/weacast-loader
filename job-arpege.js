@@ -24,11 +24,24 @@ const defaults = {
     element: 'precipitations',
     name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
     lowerLimit: 3 * 3600 // Accumulation from T to T-3H
+  }, {
+    element: 'temperature',
+    name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
+    levels: [ 2 ]
   }]
 }
 
 module.exports = (options) => {
   options = Object.assign(defaults, options)
+  const collection = (options.isobaric ?
+    `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
+  const indices = (item) => [
+    { x: 1, y: 1 },
+    { geometry: 1 },
+    { geometry: '2dsphere' },
+    [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
+    { forecastTime: 1, geometry: 1 }
+  ]
   // Forward global data store to elements
   if (options.dataStore) options.elements.forEach(element => Object.assign(element, { dataStore: options.dataStore }))
 
@@ -52,16 +65,15 @@ module.exports = (options) => {
         subsets: Object.assign({
           long: [options.bounds[0], options.bounds[2]],
           lat: [options.bounds[1], options.bounds[3]],
-          time: '<%= forecastTime.format() %>',
-          height: '<%= level %>'
-        }, options.subsets)
+          time: '<%= forecastTime.format() %>'
+        }, (options.isobaric ? { pressure: '<%= level %>' } : { height: '<%= level %>' }), options.subsets)
       }, options.request)
     },
     hooks: {
       tasks: {
         before: {
           readMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
+            collection,
             dataPath: 'data.previousData',
             query: { forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
             project: { _id: 1, runTime: 1, forecastTime: 1 },
@@ -94,17 +106,26 @@ module.exports = (options) => {
             dataPath: 'result',
             pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'dataStore', 'client']
           },
+          // Convert temperature from K to C°
+          apply: {
+            match: { element: 'temperature' },
+            function: (item) => {
+              for (let i = 0; i < item.data.length; i++) {
+                item.data[i] = item.data[i] - 273.15
+              }
+            }
+          },
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // Erase previous data if any
           deleteMongoCollection: {
-            collection: '<%= model %>-<%= element %>',
+            collection,
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
           writeRawData: {
             match: { dataStore: { $ne: 'gridfs' } },
             hook: 'writeMongoCollection',
             dataPath: 'result',
-            collection: '<%= model %>-<%= element %>',
+            collection,
             transform: {
               omit: ['id', 'model', 'element', 'dataStore', 'client']
             }
@@ -113,7 +134,7 @@ module.exports = (options) => {
             match: { dataStore: { $eq: 'gridfs' } },
             hook: 'writeMongoCollection',
             dataPath: 'result',
-            collection: '<%= model %>-<%= element %>',
+            collection,
             transform: {
               omit: ['id', 'model', 'element', 'data', 'dataStore', 'client'],
               merge: { filePath: '<%= id %>', convertedFilePath: '<%= id %>.json' }
@@ -139,7 +160,7 @@ module.exports = (options) => {
           writeTiles: {
             hook: 'writeMongoCollection',
             dataPath: 'result.data',
-            collection: '<%= model %>-<%= element %>',
+            collection,
             match: { predicate: (item) => options.tileResolution },
             transform: {
               unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } }
@@ -163,27 +184,39 @@ module.exports = (options) => {
           },
           createCollections: {
             hook: 'parallel',
-            hooks: options.elements.map(item => ({
-              hook: 'createMongoCollection',
-              collection: `${options.model}-${item.element}`,
-              indices: [
-                { x: 1, y: 1 },
-                { geometry: '2dsphere' },
-                [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
-                { forecastTime: 1, geometry: 1 }
-              ],
-              // Required so that client is forwarded from job to tasks
-              clientPath: 'taskTemplate.client'
-            }))
+            hooks: (options.isobaric ?
+              options.elements.map(item => item.levels.map(level => ({
+                hook: 'createMongoCollection',
+                collection: `${options.model}-${item.element}-${level}`,
+                indices: indices(item),
+                // Required so that client is forwarded from job to tasks
+                clientPath: 'taskTemplate.client'
+              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
+              options.elements.map(item => ({
+                hook: 'createMongoCollection',
+                collection: `${options.model}-${item.element}`,
+                indices: indices(item),
+                // Required so that client is forwarded from job to tasks
+                clientPath: 'taskTemplate.client'
+              }))
+            )
           },
           createBuckets: {
             hook: 'parallel',
-            hooks: options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
-              hook: 'createMongoBucket',
-              bucket: `${options.model}-${item.element}`,
-              // Required so that client is forwarded from job to tasks
-              clientPath: 'taskTemplate.client'
-            }))
+            hooks: (options.isobaric ?
+              options.elements.filter(item => item.dataStore === 'gridfs').map(item => item.levels.map(level => ({
+                hook: 'createMongoBucket',
+                bucket: `${options.model}-${item.element}-${level}`,
+                // Required so that client is forwarded from job to tasks
+                clientPath: 'taskTemplate.client'
+              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
+              options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
+                hook: 'createMongoBucket',
+                bucket: `${options.model}-${item.element}`,
+                // Required so that client is forwarded from job to tasks
+                clientPath: 'taskTemplate.client'
+              }))
+            )
           },
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({

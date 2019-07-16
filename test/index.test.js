@@ -39,6 +39,12 @@ describe('weacast-loader', () => {
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
   })
+  const arpegeIsobaricWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-isobaric-world.js')), {
+    element: 'temperature-isobaric',
+    model: 'arpege-world',
+    name: 'TEMPERATURE__ISOBARIC_SURFACE',
+    levels: [ 1000 ]
+  })
   const arpegeEuropeJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-europe.js')), {
     element: 'temperature',
     model: 'arpege-europe',
@@ -63,6 +69,12 @@ describe('weacast-loader', () => {
     model: 'gfs-world',
     name: 'var_TMP',
     levels: [ 'lev_surface' ]
+  })
+  const gfsIsobaricWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-gfs-isobaric-world.js')), {
+    element: 'temperature-isobaric',
+    model: 'gfs-world',
+    name: 'var_TMP',
+    levels: [ 'lev_1000_mb' ]
   })
 
   function expectFiles (model, element, level, interval, present) {
@@ -187,6 +199,20 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(10000)
 
+  it('run ARPEGE ISOBARIC WORLD dowloader', async () => {
+    const tasks = await krawler(arpegeIsobaricWorldJob)
+    expect(tasks.length).to.equal(2)
+    // Check intermediate products have been produced and final product are here
+    expectFiles('arpege-world', 'temperature-isobaric', '1000', '3', true)
+    await expectResults('arpege-world-temperature-isobaric-1000')
+    await expectDataResults('arpege-world-temperature-isobaric-1000')
+    // Tiles
+    await expectTileResults('arpege-world-temperature-isobaric-1000')
+    fs.emptyDirSync(outputPath)
+  })
+  // Let enough time to process
+  .timeout(30000)
+
   it('run ARPEGE EUROPE downloader', async () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)
@@ -295,15 +321,31 @@ describe('weacast-loader', () => {
   // Let enough time to process
   .timeout(10000)
 
+  it('run GFS ISOBARIC WORLD dowloader', async () => {
+    const tasks = await krawler(gfsIsobaricWorldJob)
+    expect(tasks.length).to.equal(2)
+    // Check intermediate products have been produced and final product are here
+    expectFiles('gfs-world', 'temperature-isobaric', '1000', '3', true)
+    await expectResults('gfs-world-temperature-isobaric-1000')
+    await expectDataResults('gfs-world-temperature-isobaric-1000')
+    // Tiles
+    await expectTileResults('gfs-world-temperature-isobaric-1000')
+    fs.emptyDirSync(outputPath)
+  })
+  // Let enough time to process
+  .timeout(30000)
+
   // Cleanup
   after(async () => {
     await db.collection('arpege-world-temperature').drop()
+    await db.collection('arpege-world-temperature-isobaric').drop()
     await db.collection('arpege-europe-temperature').drop()
     await db.collection('arome-france-temperature').drop()
     await db.collection('arome-france-high-temperature').drop()
     await db.collection('arome-france-high-temperature.chunks').drop()
     await db.collection('arome-france-high-temperature.files').drop()
     await db.collection('gfs-world-temperature').drop()
+    await db.collection('gfs-world-temperature-isobaric').drop()
     fs.emptyDirSync(outputPath)
     await dbClient.close()
   })
