@@ -27,7 +27,7 @@ const defaults = {
   }, {
     element: 'temperature',
     name: 'var_TMP',
-    levels: [ 'lev_surface' ]
+    levels: [ 'lev_2_m_above_ground' ]
   }]
 }
 

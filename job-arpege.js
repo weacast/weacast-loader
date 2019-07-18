@@ -107,6 +107,8 @@ module.exports = (options) => {
             pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'dataStore', 'client']
           },
           // Convert temperature from K to C°
+          // Although it would be required according to documentation it does not seem to be
+          /*
           apply: {
             match: { element: 'temperature' },
             function: (item) => {
@@ -115,6 +117,7 @@ module.exports = (options) => {
               }
             }
           },
+          */
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // Erase previous data if any
           deleteMongoCollection: {
