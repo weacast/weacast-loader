@@ -32,9 +32,9 @@ const defaults = {
 }
 
 module.exports = (options) => {
-  options = Object.assign(defaults, options)
-  const collection = (options.isobaric ?
-    `${options.model}-<%= element %>-<%= level.split('_')[1] %>` : '<%= model %>-<%= element %>')
+  options = Object.assign({}, defaults, options)
+  const collection = (options.isobaric
+    ? `${options.model}-<%= element %>-<%= level.split('_')[1] %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [
     { x: 1, y: 1 },
     { geometry: 1 },
@@ -151,15 +151,15 @@ module.exports = (options) => {
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           },
-          parallel: (options.isobaric ?
-            options.elements.map(item => item.levels.map(level => ({
+          parallel: (options.isobaric
+            ? options.elements.map(item => item.levels.map(level => ({
               hook: 'createMongoCollection',
               collection: `${options.model}-${item.element}-${level.split('_')[1]}`,
               indices: indices(item),
               // Required so that client is forwarded from job to tasks
               clientPath: 'taskTemplate.client'
-            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
-            options.elements.map(item => ({
+            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
+            : options.elements.map(item => ({
               hook: 'createMongoCollection',
               collection: `${options.model}-${item.element}`,
               indices: indices(item),

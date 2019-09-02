@@ -33,6 +33,7 @@ function updateJobOptions (job, element) {
 describe('weacast-loader', () => {
   let dbClient, db
   const outputPath = path.join(__dirname, '..', 'forecast-data')
+  /* see https://github.com/weacast/weacast-arpege/issues/3
   const arpegeWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-world.js')), {
     element: 'temperature',
     model: 'arpege-world',
@@ -45,11 +46,18 @@ describe('weacast-loader', () => {
     name: 'TEMPERATURE__ISOBARIC_SURFACE',
     levels: [ 1000 ]
   })
+  */
   const arpegeEuropeJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-europe.js')), {
     element: 'temperature',
     model: 'arpege-europe',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
+  })
+  const arpegeIsobaricEuropeJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-isobaric-europe.js')), {
+    element: 'temperature-isobaric',
+    model: 'arpege-europe',
+    name: 'TEMPERATURE__ISOBARIC_SURFACE',
+    levels: [ 1000 ]
   })
   const aromeFranceJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arome-france.js')), {
     element: 'temperature',
@@ -172,6 +180,7 @@ describe('weacast-loader', () => {
     expect(typeof loader.createGfsJob).to.equal('function')
   })
 
+  /* see https://github.com/weacast/weacast-arpege/issues/3
   it('run ARPEGE WORLD dowloader', async () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
@@ -212,6 +221,7 @@ describe('weacast-loader', () => {
   })
   // Let enough time to process
   .timeout(30000)
+  */
 
   it('run ARPEGE EUROPE downloader', async () => {
     const tasks = await krawler(arpegeEuropeJob)
@@ -239,6 +249,20 @@ describe('weacast-loader', () => {
   })
   // Let enough time to process
   .timeout(10000)
+
+  it('run ARPEGE ISOBARIC EUROPE downloader', async () => {
+    const tasks = await krawler(arpegeIsobaricEuropeJob)
+    expect(tasks.length).to.equal(2)
+    // Check intermediate products have been produced and final product are here
+    expectFiles('arpege-europe', 'temperature-isobaric', '1000', '1', true)
+    await expectResults('arpege-europe-temperature-isobaric-1000')
+    await expectDataResults('arpege-europe-temperature-isobaric-1000')
+    // Tiles
+    await expectTileResults('arpege-europe-temperature-isobaric-1000')
+    fs.emptyDirSync(outputPath)
+  })
+  // Let enough time to process
+  .timeout(30000)
 
   it('run AROME FRANCE downloader', async () => {
     const tasks = await krawler(aromeFranceJob)
@@ -337,16 +361,8 @@ describe('weacast-loader', () => {
 
   // Cleanup
   after(async () => {
-    await db.collection('arpege-world-temperature').drop()
-    await db.collection('arpege-world-temperature-isobaric').drop()
-    await db.collection('arpege-europe-temperature').drop()
-    await db.collection('arome-france-temperature').drop()
-    await db.collection('arome-france-high-temperature').drop()
-    await db.collection('arome-france-high-temperature.chunks').drop()
-    await db.collection('arome-france-high-temperature.files').drop()
-    await db.collection('gfs-world-temperature').drop()
-    await db.collection('gfs-world-temperature-isobaric').drop()
     fs.emptyDirSync(outputPath)
+    await db.dropDatabase()
     await dbClient.close()
   })
 })

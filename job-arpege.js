@@ -32,9 +32,9 @@ const defaults = {
 }
 
 module.exports = (options) => {
-  options = Object.assign(defaults, options)
-  const collection = (options.isobaric ?
-    `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
+  options = Object.assign({}, defaults, options)
+  const collection = (options.isobaric
+    ? `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [
     { x: 1, y: 1 },
     { geometry: 1 },
@@ -187,15 +187,15 @@ module.exports = (options) => {
           },
           createCollections: {
             hook: 'parallel',
-            hooks: (options.isobaric ?
-              options.elements.map(item => item.levels.map(level => ({
+            hooks: (options.isobaric
+              ? options.elements.map(item => item.levels.map(level => ({
                 hook: 'createMongoCollection',
                 collection: `${options.model}-${item.element}-${level}`,
                 indices: indices(item),
                 // Required so that client is forwarded from job to tasks
                 clientPath: 'taskTemplate.client'
-              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
-              options.elements.map(item => ({
+              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
+              : options.elements.map(item => ({
                 hook: 'createMongoCollection',
                 collection: `${options.model}-${item.element}`,
                 indices: indices(item),
@@ -206,14 +206,14 @@ module.exports = (options) => {
           },
           createBuckets: {
             hook: 'parallel',
-            hooks: (options.isobaric ?
-              options.elements.filter(item => item.dataStore === 'gridfs').map(item => item.levels.map(level => ({
+            hooks: (options.isobaric
+              ? options.elements.filter(item => item.dataStore === 'gridfs').map(item => item.levels.map(level => ({
                 hook: 'createMongoBucket',
                 bucket: `${options.model}-${item.element}-${level}`,
                 // Required so that client is forwarded from job to tasks
                 clientPath: 'taskTemplate.client'
-              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []) :
-              options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
+              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
+              : options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
                 hook: 'createMongoBucket',
                 bucket: `${options.model}-${item.element}`,
                 // Required so that client is forwarded from job to tasks
