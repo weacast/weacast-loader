@@ -361,10 +361,10 @@ describe('weacast-loader', () => {
 
   // Cleanup
   after(async () => {
+    // Let enough time to process
+    this.timeout(30000)
     fs.emptyDirSync(outputPath)
     await db.dropDatabase()
     await dbClient.close()
   })
-  // Let enough time to process
-  .timeout(30000)
 })
