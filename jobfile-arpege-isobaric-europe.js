@@ -21,15 +21,15 @@ module.exports = createJob({
     upperLimit: 102 * 3600            // Up to T0+102
   },
   elements: [{
-    element: 'u-wind-isobaric',
+    element: 'u-wind',
     name: 'U_COMPONENT_OF_WIND__ISOBARIC_SURFACE',
     levels: [ 1000, 700, 450, 300, 200 ]
   }, {
-    element: 'v-wind-isobaric',
+    element: 'v-wind',
     name: 'V_COMPONENT_OF_WIND__ISOBARIC_SURFACE',
     levels: [ 1000, 700, 450, 300, 200 ]
   }, {
-    element: 'temperature-isobaric',
+    element: 'temperature',
     name: 'TEMPERATURE__ISOBARIC_SURFACE',
     levels: [ 1000, 700, 450, 300, 200 ]
   }],
