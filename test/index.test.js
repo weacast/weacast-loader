@@ -365,4 +365,6 @@ describe('weacast-loader', () => {
     await db.dropDatabase()
     await dbClient.close()
   })
+  // Let enough time to process
+  .timeout(30000)
 })
