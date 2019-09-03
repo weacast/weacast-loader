@@ -18,15 +18,15 @@ module.exports = createJob({
     upperLimit: 240 * 3600          // Up to T0+240
   },
   elements: [{
-    element: 'u-wind-isobaric',
+    element: 'u-wind',
     name: 'var_UGRD',
     levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
   }, {
-    element: 'v-wind-isobaric',
+    element: 'v-wind',
     name: 'var_VGRD',
     levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
   }, {
-    element: 'temperature-isobaric',
+    element: 'temperature',
     name: 'var_TMP',
     levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
   }],
