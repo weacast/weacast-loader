@@ -7,8 +7,8 @@ module.exports = createJob({
   bounds: [0, -90, 360, 90],
   origin: [0, 90],
   size: [1440, 721],
-  resolution: [0.5, 0.5],
-  tileResolution: [20, 20],
+  resolution: [0.25, 0.25],
+  tileResolution: [10, 10],
   nwp: {
     runInterval: 6 * 3600,          // Produced every 6h
     oldestRunInterval: 24 * 3600,   // Don't go back in time older than 1 day

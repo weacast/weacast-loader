@@ -33,7 +33,6 @@ function updateJobOptions (job, element) {
 describe('weacast-loader', () => {
   let dbClient, db
   const outputPath = path.join(__dirname, '..', 'forecast-data')
-  /* see https://github.com/weacast/weacast-arpege/issues/3
   const arpegeWorldJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-world.js')), {
     element: 'temperature',
     model: 'arpege-world',
@@ -46,7 +45,6 @@ describe('weacast-loader', () => {
     name: 'TEMPERATURE__ISOBARIC_SURFACE',
     levels: [ 1000 ]
   })
-  */
   const arpegeEuropeJob = updateJobOptions(require(path.join(__dirname, '..', 'jobfile-arpege-europe.js')), {
     element: 'temperature',
     model: 'arpege-europe',
