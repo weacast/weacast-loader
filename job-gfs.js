@@ -121,7 +121,7 @@ module.exports = (options) => {
             dataPath: 'result',
             collection,
             transform: { omit: ['id', 'model', 'element', 'client'] } },
-          emitEvent: { name: '<%= model %>-<%= element %>', pick: [ 'runTime', 'forecastTime' ] },
+          emitEvent: { name: collection, pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
             match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',
