@@ -6,9 +6,6 @@ services:
 - docker
 - mongodb
 addons:
-  apt:
-    packages:
-    - oracle-java9-set-default
   code_climate:
     repo_token: 3f30a58b36c68a3e9436795b8a99f2f134a6d884ceb7e055ee7b39589886281d
 notifications:
@@ -19,9 +16,8 @@ notifications:
     on_success: always
     on_failure: always
 before_script:
-- npm install -g codeclimate-test-reporter
-- export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 - "$JAVA_HOME/bin/java -version"
+- npm install -g codeclimate-test-reporter
 - npm install -g weacast-gtiff2json@1.0.0
 - npm install -g weacast-grib2json@1.0.1
 - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
