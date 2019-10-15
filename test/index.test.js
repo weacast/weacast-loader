@@ -180,7 +180,6 @@ describe('weacast-loader', () => {
     expect(typeof loader.createGfsJob).to.equal('function')
   })
 
-  /* see https://github.com/weacast/weacast-arpege/issues/3
   it('run ARPEGE WORLD dowloader', async () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
@@ -221,8 +220,7 @@ describe('weacast-loader', () => {
   })
   // Let enough time to process
   .timeout(30000)
-  */
-
+  
   it('run ARPEGE EUROPE downloader', async () => {
     const tasks = await krawler(arpegeEuropeJob)
     expect(tasks.length).to.equal(2)

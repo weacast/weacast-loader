@@ -58,7 +58,7 @@ module.exports = (options) => {
       type: 'wcs',
       // Common options for models, some will be setup on a per-model basis
       options: Object.assign({
-        url: 'https://geoservices.meteofrance.fr/services/MF-NWP-GLOBAL-ARPEGE-05-GLOBE-WCS',
+        url: 'https://geoservices.meteofrance.fr/services/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS',
         version: '2.0.1',
         token: process.env.METEO_FRANCE_TOKEN || '__qEMDoIC2ogPRlSoRQLGUBOomaxJyxdEd__',
         coverageid: '<%= name %>___<%= runTime.format() %>',

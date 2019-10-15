@@ -6,7 +6,7 @@ module.exports = createJob({
   model: 'arpege-world',
   bounds: [0, -90, 360, 90],
   origin: [0, 90],
-  size: [720, 361],
+  size: [1440, 721],
   resolution: [0.5, 0.5],
   tileResolution: [20, 20],
   nwp: {
