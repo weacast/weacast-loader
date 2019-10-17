@@ -8,4 +8,4 @@ ENV SYNC_DB_URL=$SYNC_DB_URL
 
 COPY jobfile-gfs-isobaric-world.js .
 
-CMD node ./krawler --cron "0 0,30 * * * *" --sync "$SYNC_DB_URL" jobfile-gfs-isobaric-world.js
+CMD node ./krawler --cron "0 25,55 * * * *" --sync "$SYNC_DB_URL" jobfile-gfs-isobaric-world.js
