@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.1.0](https://github.com/weacast/weacast-loader/tree/v1.1.0) (2019-11-14)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.0.3...v1.1.0)
+
+**Implemented enhancements:**
+
+- Add sample jobs for isobaric elements like wind [\#10](https://github.com/weacast/weacast-loader/issues/10)
+- Add temperature element to default configuration [\#9](https://github.com/weacast/weacast-loader/issues/9)
+
+**Fixed bugs:**
+
+- ARPEGE world job not working anymore [\#15](https://github.com/weacast/weacast-loader/issues/15)
+
 ## [v1.0.3](https://github.com/weacast/weacast-loader/tree/v1.0.3) (2019-06-14)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.0.2...v1.0.3)
