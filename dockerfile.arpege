@@ -1,17 +1,25 @@
-FROM  node:8-stretch
+ARG KRAWLER_TAG=latest
+ARG GTIFF2JSON_TAG=1.0.0
 
-MAINTAINER Kalisio <contact@kalisio.xyz>
+# Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
+FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 
-ARG KRAWLER_BRANCH
-ENV KRAWLER_BRANCH=$KRAWLER_BRANCH
+# Make the job image using the krawler image alias
+FROM node:8-buster-slim
 
-RUN mkdir /home/node/.npm-global
-ENV PATH=/home/node/.npm-global/bin:$PATH
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
-RUN npm install -g weacast-gtiff2json@1.0.0 --unsafe
-RUN git clone https://github.com/kalisio/krawler.git -b $KRAWLER_BRANCH --single-branch && cd krawler && yarn install && cd ..
+# Install weacast-gtiff2json
+RUN npm install -g weacast-gtiff2json@${GTIFF2JSON_TAG} --unsafe
 
+# Install GDAL
+RUN apt-get update && apt-get -y install gdal-bin
+
+# Copy Krawler
+COPY --from=krawler /opt/krawler /opt/krawler
+ENV NODE_PATH=/opt/krawler/node_modules
+
+# Install the job
 COPY job-arpege.js .
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node ./krawler/healthcheck.js --success-rate 0.75
+HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node /opt/krawler/healthcheck.js --success-rate 0.75
