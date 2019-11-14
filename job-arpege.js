@@ -33,6 +33,9 @@ const defaults = {
 
 module.exports = (options) => {
   options = Object.assign({}, defaults, options)
+  const filepath = `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`
+  const id = `${options.model}/${filepath}`
+  const archiveId = `archive/${options.model}/<%= runTime.format('YYYY/MM/DD/HH') %>/${filepath}`
   const collection = (options.isobaric
     ? `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [
@@ -44,6 +47,25 @@ module.exports = (options) => {
   ]
   // Forward global data store to elements
   if (options.dataStore) options.elements.forEach(element => Object.assign(element, { dataStore: options.dataStore }))
+  // Check if we archive on S3
+  let stores = [{
+    id: 'fs',
+    options: {
+      path: outputPath
+    }
+  }]
+  if (process.env.S3_BUCKET) {
+    stores.push({
+      id: 's3',
+      options: {
+        client: {
+          accessKeyId: process.env.S3_ACCESS_KEY,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+        },
+        bucket: process.env.S3_BUCKET
+      }
+    })
+  }
 
   return {
     id: options.id,
@@ -53,8 +75,7 @@ module.exports = (options) => {
       faultTolerant: true
     },
     taskTemplate: {
-      // id: 'arpege/<%= element %>/<%= level %>/<%= forecastTime.format(\'YYYY-MM-DD[_]HH-mm-ss\') %>',
-      id: `${options.model}/<%= element %>/<%= level %>/<%= timeOffset / 3600 %>`,
+      id,
       type: 'wcs',
       // Common options for models, some will be setup on a per-model basis
       options: Object.assign({
@@ -95,6 +116,21 @@ module.exports = (options) => {
           }
         },
         after: {
+          // Generate Cloud optimized GeoTIFF for archiving
+          processRawData: {
+            match: { predicate: () => process.env.S3_BUCKET },
+            hook: 'runCommand',
+            command: `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
+          },
+          // Upload archive data to S3
+          archiveRawData: {
+            match: { predicate: () => process.env.S3_BUCKET },
+            hook: 'copyToStore',
+            input: { key: '<%= id %>.tif', store: 'fs' },
+            output: { key: `${archiveId}.tif`, store: 's3',
+              params: { ACL: 'public-read' }
+            }
+          },
           runCommand: {
             command: `weacast-gtiff2json ${outputPath}/<%= id %> -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
           },
@@ -174,12 +210,7 @@ module.exports = (options) => {
       },
       jobs: {
         before: {
-          createStores: {
-            id: 'fs',
-            options: {
-              path: outputPath
-            }
-          },
+          createStores: stores,
           connectMongo: {
             url: options.dbUrl,
             // Required so that client is forwarded from job to tasks
@@ -232,7 +263,7 @@ module.exports = (options) => {
             clientPath: 'taskTemplate.client'
           },
           clearOutputs: {},
-          removeStores: ['fs']
+          removeStores: stores.map(store => store.id)
         }
       }
     }
