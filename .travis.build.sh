@@ -1,5 +1,5 @@
 #!/bin/bash
-source travis.env.sh
+source .travis.env.sh
 
 docker build --build-arg KRAWLER_BRANCH=$KRAWLER_BRANCH -f dockerfile.arpege -t weacast/weacast-arpege:$VERSION .
 docker build --build-arg KRAWLER_BRANCH=$KRAWLER_BRANCH -f dockerfile.gfs -t weacast/weacast-gfs:$VERSION .
