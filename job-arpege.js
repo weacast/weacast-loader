@@ -138,6 +138,7 @@ module.exports = (options) => {
             command: `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
           },
           // Upload archive data to S3
+          /* Raw data is too big to be archived right now
           archiveRawData: {
             match: { predicate: () => process.env.S3_BUCKET },
             hook: 'copyToStore',
@@ -146,6 +147,7 @@ module.exports = (options) => {
               params: { ACL: 'public-read' }
             }
           },
+          */
           archiveProcessedData: {
             match: { predicate: () => process.env.S3_BUCKET },
             hook: 'copyToStore',
