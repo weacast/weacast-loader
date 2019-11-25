@@ -33,9 +33,10 @@ const defaults = {
 
 module.exports = (options) => {
   options = Object.assign({}, defaults, options)
+  // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
   const filepath = `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`
   const id = `${options.model}/${filepath}`
-  const archiveId = `archive/${options.model}/<%= runTime.format('YYYY/MM/DD/HH') %>/${filepath}`
+  const archiveId = `archive/${options.model}/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
   const collection = (options.isobaric
     ? `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [
@@ -117,8 +118,23 @@ module.exports = (options) => {
         },
         after: {
           // Generate Cloud optimized GeoTIFF for archiving
+          // Move from [0°, 360°] longitude range to [-180°, 180°] longitude range whenever required
+          processAndSwipeRawData: {
+            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] > 180) },
+            hook: 'runCommand',
+            command: [
+            // Create first a replication from [0, 360] to [-360, 0] and a VRT covering [-360, 360]
+            // Then extract the portion between [-180, 180] from this VRT
+            // Last, build the Cloud-Optimized GeoTiff
+            `gdal_translate -a_ullr -360.125 90.125 -0.125 -90.125 ${outputPath}/<%= id %> ${outputPath}/<%= id %>_shifted`,
+            `gdalbuildvrt ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %> ${outputPath}/<%= id %>_shifted`,
+            `gdal_translate ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_180.vrt -projwin -180.125 90.125 179.875 -90.125 -of VRT`,
+            `gdalwarp -overwrite -ot Float32 -wo NUM_THREADS=6 -wo SOURCE_EXTRA=100 ${outputPath}/<%= id %>_180.vrt ${outputPath}/<%= id %>_180.tif`,
+            `gdal_translate ${outputPath}/<%= id %>_180.tif ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
+            ]
+          },
           processRawData: {
-            match: { predicate: () => process.env.S3_BUCKET },
+            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] <= 180) },
             hook: 'runCommand',
             command: `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
           },
