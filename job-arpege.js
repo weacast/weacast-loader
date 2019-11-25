@@ -125,7 +125,6 @@ module.exports = (options) => {
             command: [
             // Create first a replication from [0, 360] to [-360, 0] and a VRT covering [-360, 360]
             // Then extract the portion between [-180, 180] from this VRT
-            // Last, build the Cloud-Optimized GeoTiff
             `gdal_translate -a_ullr -360.125 90.125 -0.125 -90.125 ${outputPath}/<%= id %> ${outputPath}/<%= id %>_shifted`,
             `gdalbuildvrt ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %> ${outputPath}/<%= id %>_shifted`,
             `gdal_translate ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_180.vrt -projwin -180.125 90.125 179.875 -90.125 -of VRT`,
@@ -142,8 +141,16 @@ module.exports = (options) => {
           archiveRawData: {
             match: { predicate: () => process.env.S3_BUCKET },
             hook: 'copyToStore',
-            input: { key: '<%= id %>.tif', store: 'fs' },
+            input: { key: '<%= id %>', store: 'fs' },
             output: { key: `${archiveId}.tif`, store: 's3',
+              params: { ACL: 'public-read' }
+            }
+          },
+          archiveProcessedData: {
+            match: { predicate: () => process.env.S3_BUCKET },
+            hook: 'copyToStore',
+            input: { key: '<%= id %>.tif', store: 'fs' },
+            output: { key: `${archiveId}.cog`, store: 's3',
               params: { ACL: 'public-read' }
             }
           },
