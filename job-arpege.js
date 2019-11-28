@@ -36,7 +36,8 @@ module.exports = (options) => {
   // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
   const filepath = `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`
   const id = `${options.model}/${filepath}`
-  const archiveId = `archive/${options.model}/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
+  const archiveId = (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
+    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
   const collection = (options.isobaric
     ? `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [

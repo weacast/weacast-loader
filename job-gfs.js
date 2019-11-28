@@ -35,7 +35,8 @@ module.exports = (options) => {
   options = Object.assign({}, defaults, options)
   const filepath = `<%= element %>/<%= level.split('_')[1] %>/<%= timeOffset / 3600 %>`
   const id = `${options.model}/${filepath}`
-  const archiveId = `archive/${options.model}/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
+  const archiveId = (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
+    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
   const collection = (options.isobaric
     ? `${options.model}-<%= element %>-<%= level.split('_')[1] %>` : '<%= model %>-<%= element %>')
   const indices = (item) => [
