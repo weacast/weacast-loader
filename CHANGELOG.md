@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.2.0](https://github.com/weacast/weacast-loader/tree/v1.2.0) (2020-01-02)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.1.0...v1.2.0)
+
+**Implemented enhancements:**
+
+- Enhance docker build to decrease image size [\#17](https://github.com/weacast/weacast-loader/issues/17)
+- Make loaders configurable to push data to AWS S3 for archiving [\#16](https://github.com/weacast/weacast-loader/issues/16)
+
 ## [v1.1.0](https://github.com/weacast/weacast-loader/tree/v1.1.0) (2019-11-14)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.0.3...v1.1.0)
