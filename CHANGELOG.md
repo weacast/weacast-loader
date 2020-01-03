@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.3.0](https://github.com/weacast/weacast-loader/tree/v1.3.0) (2020-01-03)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.2.0...v1.3.0)
+
 ## [v1.2.0](https://github.com/weacast/weacast-loader/tree/v1.2.0) (2020-01-02)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.1.0...v1.2.0)
