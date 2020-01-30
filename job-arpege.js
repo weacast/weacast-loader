@@ -281,6 +281,7 @@ module.exports = (options) => {
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
             runIndex: 0, // -1 is not current run but previous one to ensure it is already available
+            keepPastForecasts: true, // We'd like to keep forecast data since the start of the run for archiving
             elements: options.elements.map(element => Object.assign({ model: options.model }, element))
           }, options.nwp)
         },
