@@ -1,11 +1,11 @@
 ARG KRAWLER_TAG=latest
-ARG GTIFF2JSON_TAG=1.0.0
+ARG GTIFF2JSON_TAG=1.1.0
 
 # Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 
 # Make the job image using the krawler image alias
-FROM node:8-buster-slim
+FROM node:12-buster-slim
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
