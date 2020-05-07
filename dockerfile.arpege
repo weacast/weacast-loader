@@ -13,7 +13,7 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 RUN apt-get update && apt-get -y install gdal-bin
 
 # Install weacast-gtiff2json
-RUN npm install -g weacast-gtiff2json@${GTIFF2JSON_TAG} --unsafe
+RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
 
 # Copy Krawler
 COPY --from=krawler /opt/krawler /opt/krawler
