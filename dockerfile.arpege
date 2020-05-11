@@ -9,11 +9,11 @@ FROM node:12-buster
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
-# Install GDAL
-RUN apt-get update && apt-get -y install gdal-bin
-
 # Install weacast-gtiff2json
 RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
+
+# Install GDAL
+RUN apt-get update && apt-get -y install gdal-bin
 
 # Copy Krawler
 COPY --from=krawler /opt/krawler /opt/krawler
