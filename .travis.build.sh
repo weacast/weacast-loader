@@ -2,6 +2,9 @@
 source .travis.env.sh
 
 docker build --build-arg KRAWLER_TAG=$KRAWLER_TAG -f dockerfile.arpege -t weacast/weacast-arpege:$VERSION .
+# turn off non-blocking mode of stdout since it seems to create issues with next docker builds ...
+# cf. https://blog.m157q.tw/posts/2018/03/30/travis-ci-stdout-write-error-and-resource-temporarily-unavailable-workaround/
+python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
 docker build --build-arg KRAWLER_TAG=$KRAWLER_TAG -f dockerfile.gfs -t weacast/weacast-gfs:$VERSION .
 docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
 docker push weacast/weacast-arpege:$VERSION
