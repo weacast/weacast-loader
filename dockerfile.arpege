@@ -12,8 +12,6 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 # It appears we have a problem when downloading GDAL binaries in gdal-next if we don't set this
 # RUN yarn config set unsafe-perm true --global
 
-RUN curl -sSfv https://gdal-next-binary.s3.amazonaws.com/gdal/v1.0.2/node-v72-linux-x64.tar.gz 
-
 # Install weacast-gtiff2json
 # RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
 RUN yarn add weacast-gtiff2json@${GTIFF2JSON_TAG}
