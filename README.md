@@ -15,6 +15,20 @@ These data are then served using the [Weacast services API](https://github.com/w
 
 To debug a loader you can run this command from a local krawler/MongoDB install `node --inspect . --cron "0 15,45 * * * *" --run --sync "mongodb://127.0.0.1:27017/weacast" D:\Development\weacast\weacast-loader\jobfile-arpege-europe.js`
 
+To build a Docker image and test it locally:
+```
+// Base image with latest krawler
+docker build --build-arg KRAWLER_TAG=latest -f dockerfile.arpege -t weacast/weacast-arpege:latest .
+// Model-specific image
+docker build --build-arg TAG=latest -f dockerfile.arpege-europe -t weacast/weacast-arpege:europe-latest .
+// Define any required env vars
+METEO_FRANCE_TOKEN=xxx
+// Run with Mongo instance
+docker-compose up -d mongodb-weacast weacast-arpege-europe
+// Stop
+docker-compose down -v
+```
+
 ## Documentation
 
 The [Weacast docs](https://weacast.github.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.

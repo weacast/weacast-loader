@@ -37,9 +37,9 @@ jobs:
     before_script:
     - "$JAVA_HOME/bin/java -version"
     - npm install -g codeclimate-test-reporter
-    - npm install -g weacast-gtiff2json@1.1.1
-    - npm install -g weacast-grib2json@1.0.1
     - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
     - yarn link '@kalisio/krawler'
+    - yarn global add weacast-gtiff2json@1.1.2
+    - yarn global add weacast-grib2json@1.0.1
     after_script:
     - codeclimate-test-reporter < coverage/lcov.info
