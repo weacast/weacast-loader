@@ -22,7 +22,7 @@ jobs:
     services:
     - docker
     script:
-    - travis_wait 60 bash .travis.build.sh
+    - bash .travis.build.sh
 
   - stage: TEST
     language: node_js
