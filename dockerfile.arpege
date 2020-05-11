@@ -9,19 +9,18 @@ FROM node:12-buster
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
+# Copy Krawler
+COPY --from=krawler /opt/krawler /opt/krawler
+ENV NODE_PATH=/opt/krawler/node_modules
+
 # It appears we have a problem when downloading GDAL binaries in gdal-next if we don't set this
 # RUN yarn config set unsafe-perm true --global
 
 # Install weacast-gtiff2json
-# RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
-RUN yarn add weacast-gtiff2json@${GTIFF2JSON_TAG}
+RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
 
 # Install GDAL
 RUN apt-get update && apt-get -y install gdal-bin
-
-# Copy Krawler
-COPY --from=krawler /opt/krawler /opt/krawler
-ENV NODE_PATH=/opt/krawler/node_modules
 
 # Install the job
 COPY job-arpege.js .
