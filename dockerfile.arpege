@@ -9,6 +9,9 @@ FROM node:12-buster
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
+# It appears we have a problem with invalid certificates when downloading GDAL binaries in gdal-next
+RUN NODE_TLS_REJECT_UNAUTHORIZED=0
+
 # Install weacast-gtiff2json
 RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
 
