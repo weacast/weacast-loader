@@ -1,8 +1,8 @@
 #!/bin/bash
 source .travis.env.sh
 
-docker build --build-arg KRAWLER_BRANCH=$KRAWLER_BRANCH -f dockerfile.arpege -t weacast/weacast-arpege:$VERSION .
-docker build --build-arg KRAWLER_BRANCH=$KRAWLER_BRANCH -f dockerfile.gfs -t weacast/weacast-gfs:$VERSION .
+docker build --build-arg KRAWLER_TAG=$KRAWLER_TAG -f dockerfile.arpege -t weacast/weacast-arpege:$VERSION .
+docker build --build-arg KRAWLER_TAG=$KRAWLER_TAG -f dockerfile.gfs -t weacast/weacast-gfs:$VERSION .
 docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
 docker push weacast/weacast-arpege:$VERSION
 docker push weacast/weacast-gfs:$VERSION
