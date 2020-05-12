@@ -39,7 +39,7 @@ jobs:
     - npm install -g codeclimate-test-reporter
     - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
     - yarn link '@kalisio/krawler'
-    - yarn global add weacast-gtiff2json@1.1.2
+    - travis_wait 60 yarn global add weacast-gtiff2json@1.1.2
     - yarn global add weacast-grib2json@1.0.1
     after_script:
     - codeclimate-test-reporter < coverage/lcov.info
