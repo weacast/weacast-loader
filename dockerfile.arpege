@@ -5,7 +5,7 @@ ARG GTIFF2JSON_TAG=1.1.2
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 
 # Make the job image using the krawler image alias
-FROM node:12-buster
+FROM node:12-buster-slim
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
@@ -13,14 +13,11 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 COPY --from=krawler /opt/krawler /opt/krawler
 ENV NODE_PATH=/opt/krawler/node_modules
 
-# It appears we have a problem when downloading GDAL binaries in gdal-next if we don't set this
-# RUN yarn config set unsafe-perm true --global
+# Install GDAL
+RUN apt-get update && apt-get -y install gdal-bin git && apt-get clean
 
 # Install weacast-gtiff2json
 RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
-
-# Install GDAL
-RUN apt-get update && apt-get -y install gdal-bin
 
 # Install the job
 COPY job-arpege.js .
