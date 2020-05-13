@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.4.0](https://github.com/weacast/weacast-loader/tree/v1.4.0) (2020-05-13)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.3.0...v1.4.0)
+
+## [v1.3.0](https://github.com/weacast/weacast-loader/tree/v1.3.0) (2020-05-13)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.2.0...v1.3.0)
+
+**Fixed bugs:**
+
+- Archive is missing the first forecast times of a given run [\#20](https://github.com/weacast/weacast-loader/issues/20)
+
 ## [v1.2.0](https://github.com/weacast/weacast-loader/tree/v1.2.0) (2020-01-02)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.1.0...v1.2.0)
