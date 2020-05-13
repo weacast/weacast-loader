@@ -10,5 +10,5 @@ then
 	export KRAWLER_TAG=latest
 else
 	export VERSION=$(node -p -e "require('./package.json').version")
-	export KRAWLER_TAG=v$(node -p -e "require('./package.json').peerDependencies['@kalisio/krawler']")
+	export KRAWLER_TAG=$(node -p -e "require('./package.json').peerDependencies['@kalisio/krawler']")
 fi
