@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.4.2](https://github.com/weacast/weacast-loader/tree/v1.4.2) (2020-10-09)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.4.1...v1.4.2)
+
+**Fixed bugs:**
+
+- Build not working anymore [\#21](https://github.com/weacast/weacast-loader/issues/21)
+
 ## [v1.4.1](https://github.com/weacast/weacast-loader/tree/v1.4.1) (2020-05-13)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.4.0...v1.4.1)
