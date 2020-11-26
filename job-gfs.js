@@ -28,17 +28,20 @@ const defaults = {
     element: 'temperature',
     name: 'var_TMP',
     levels: [ 'lev_2_m_above_ground' ]
-  }]
+  }],
+  filepath: `<%= element %>/<%= level.split('_')[1] %>/<%= timeOffset / 3600 %>`,
+  collection: '<% if (levels.length > 1) { %> <%= model %>-<%= element %>-<%= level.split('_')[1] %> <% } else { %> <%= model %>-<%= element %> <% } %>',,
+  archiveId: (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
+    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
+  cog: true
 }
 
 module.exports = (options) => {
   options = Object.assign({}, defaults, options)
-  const filepath = `<%= element %>/<%= level.split('_')[1] %>/<%= timeOffset / 3600 %>`
+  const filepath = options.filepath
   const id = `${options.model}/${filepath}`
-  const archiveId = (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
-    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
-  const collection = (options.isobaric
-    ? `${options.model}-<%= element %>-<%= level.split('_')[1] %>` : '<%= model %>-<%= element %>')
+  const archiveId = options.archiveId
+  const collection = options.collection
   const indices = (item) => [
     { x: 1, y: 1 },
     { geometry: 1 },
@@ -59,7 +62,8 @@ module.exports = (options) => {
       options: {
         client: {
           accessKeyId: process.env.S3_ACCESS_KEY,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+          endpoint: process.env.S3_ENDPOINT
         },
         bucket: process.env.S3_BUCKET
       }
@@ -107,7 +111,7 @@ module.exports = (options) => {
           // Generate Cloud optimized GeoTIFF for archiving
           // Move from [0°, 360°] longitude range to [-180°, 180°] longitude range whenever required
           processAndSwipeRawData: {
-            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] > 180) },
+            match: { predicate: () => process.env.S3_BUCKET && options.cog && (options.bounds[2] > 180) },
             hook: 'runCommand',
             command: [
             // First convert from Grib to GeoTiff
@@ -122,23 +126,21 @@ module.exports = (options) => {
             ]
           },
           processRawData: {
-            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] <= 180) },
+            match: { predicate: () => process.env.S3_BUCKET && options.cog && (options.bounds[2] <= 180) },
             hook: 'runCommand',
             command: `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
           },
-          // Upload archive data to S3
-          /* Raw data is too big to be archived right now
+          // Upload raw archive data to S3
           archiveRawData: {
-            match: { predicate: () => process.env.S3_BUCKET },
+            match: { predicate: () => !options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>', store: 'fs' },
             output: { key: `${archiveId}.grib`, store: 's3',
               params: { ACL: 'public-read' }
             }
           },
-          */
           archiveProcessedData: {
-            match: { predicate: () => process.env.S3_BUCKET },
+            match: { predicate: () => options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>.tif', store: 'fs' },
             output: { key: `${archiveId}.cog`, store: 's3',
@@ -153,7 +155,7 @@ module.exports = (options) => {
             objectPath: '[0].data',
             key: '<%= id %>.json'
           },
-          transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'client'] },
+          transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'levels', 'runTime', 'forecastTime', 'data', 'client'] },
           // For forecast hours evenly divisible by 6, the accumulation period is from T-6h to T,
           // while for other forecast hours (divisible by 3 but not 6) it is from T-3h to T.
           // We unify everything to 3H accumulation period.
@@ -183,7 +185,7 @@ module.exports = (options) => {
           writeRawData: { hook: 'writeMongoCollection',
             dataPath: 'result',
             collection,
-            transform: { omit: ['id', 'model', 'element', 'client'] } },
+            transform: { omit: ['id', 'model', 'levels', 'element', 'client'] } },
           emitEvent: { name: collection, pick: [ 'runTime', 'forecastTime' ] },
           tileGrid: {
             match: { predicate: (item) => options.tileResolution },
@@ -209,22 +211,13 @@ module.exports = (options) => {
             // Required so that client is forwarded from job to tasks
             clientPath: 'taskTemplate.client'
           },
-          parallel: (options.isobaric
-            ? options.elements.map(item => item.levels.map(level => ({
-              hook: 'createMongoCollection',
-              collection: `${options.model}-${item.element}-${level.split('_')[1]}`,
-              indices: indices(item),
-              // Required so that client is forwarded from job to tasks
-              clientPath: 'taskTemplate.client'
-            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
-            : options.elements.map(item => ({
-              hook: 'createMongoCollection',
-              collection: `${options.model}-${item.element}`,
-              indices: indices(item),
-              // Required so that client is forwarded from job to tasks
-              clientPath: 'taskTemplate.client'
-            }))
-          ),
+          parallel: options.elements.map(item => (item.levels || [null]).map(level => ({
+            hook: 'createMongoCollection',
+            collection: (item.levels && item.levels.length > 1 ? `${options.model}-${item.element}-${level.split('_')[1]}` : `${options.model}-${item.element}`),
+            indices: indices(item),
+            // Required so that client is forwarded from job to tasks
+            clientPath: 'taskTemplate.client'
+          }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), []),
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
             runIndex: 0, // -1 is not current run but previous one to ensure it is already available

@@ -1,7 +1,7 @@
 const path = require('path')
 const outputPath = path.join(__dirname, 'forecast-data')
 
-const defaults = {
+const defaults = (options) => ({
   id: 'weacast-arpege',
   model: 'arpege',
   dbUrl: process.env.DB_URL || 'mongodb://127.0.0.1:27017/weacast',
@@ -23,23 +23,28 @@ const defaults = {
   }, {
     element: 'precipitations',
     name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
-    lowerLimit: 3 * 3600 // Accumulation from T to T-3H
+    lowerLimit: 3 * 3600, // Accumulation from T to T-3H
+    levels: [undefined] // Implicit surface level
   }, {
     element: 'temperature',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
     levels: [ 2 ]
-  }]
-}
+  }],
+  // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
+  filepath: `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`,
+  collection: '<% if (levels.length > 1) { %> <%= model %>-<%= element %>-<%= level %> <% } else { %> <%= model %>-<%= element %> <% } %>',
+  archiveId: (options.isobaric ? 'archive/<%= model %>-isobaric' : 'archive/<%= model %>') +
+    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
+  cog: true
+})
 
 module.exports = (options) => {
-  options = Object.assign({}, defaults, options)
-  // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
-  const filepath = `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`
+  options = Object.assign({}, defaults(options), options)
+  const filepath = options.filepath
   const id = `${options.model}/${filepath}`
-  const archiveId = (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
-    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`
-  const collection = (options.isobaric
-    ? `${options.model}-<%= element %>-<%= level %>` : '<%= model %>-<%= element %>')
+  const archiveId = options.archiveId
+  const collection = options.collection
+  const bucket = collection
   const indices = (item) => [
     { x: 1, y: 1 },
     { geometry: 1 },
@@ -62,7 +67,8 @@ module.exports = (options) => {
       options: {
         client: {
           accessKeyId: process.env.S3_ACCESS_KEY,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+          endpoint: process.env.S3_ENDPOINT
         },
         bucket: process.env.S3_BUCKET
       }
@@ -121,7 +127,7 @@ module.exports = (options) => {
           // Generate Cloud optimized GeoTIFF for archiving
           // Move from [0°, 360°] longitude range to [-180°, 180°] longitude range whenever required
           processAndSwipeRawData: {
-            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] > 180) },
+            match: { predicate: () => process.env.S3_BUCKET && options.cog && (options.bounds[2] > 180) },
             hook: 'runCommand',
             command: [
             // Create first a replication from [0, 360] to [-360, 0] and a VRT covering [-360, 360]
@@ -134,23 +140,21 @@ module.exports = (options) => {
             ]
           },
           processRawData: {
-            match: { predicate: () => process.env.S3_BUCKET && (options.bounds[2] <= 180) },
+            match: { predicate: () => process.env.S3_BUCKET && options.cog && (options.bounds[2] <= 180) },
             hook: 'runCommand',
             command: `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
           },
-          // Upload archive data to S3
-          /* Raw data is too big to be archived right now
+          // Upload raw archive data to S3
           archiveRawData: {
-            match: { predicate: () => process.env.S3_BUCKET },
+            match: { predicate: () => !options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>', store: 'fs' },
             output: { key: `${archiveId}.tif`, store: 's3',
               params: { ACL: 'public-read' }
             }
           },
-          */
           archiveProcessedData: {
-            match: { predicate: () => process.env.S3_BUCKET },
+            match: { predicate: () => options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>.tif', store: 'fs' },
             output: { key: `${archiveId}.cog`, store: 's3',
@@ -166,7 +170,7 @@ module.exports = (options) => {
           },
           transformJson: {
             dataPath: 'result',
-            pick: ['id', 'model', 'element', 'level', 'runTime', 'forecastTime', 'data', 'dataStore', 'client']
+            pick: ['id', 'model', 'element', 'level', 'levels', 'runTime', 'forecastTime', 'data', 'dataStore', 'client']
           },
           // Convert temperature from K to C°
           // Although it would be required according to documentation it does not seem to be
@@ -192,7 +196,7 @@ module.exports = (options) => {
             dataPath: 'result',
             collection,
             transform: {
-              omit: ['id', 'model', 'element', 'dataStore', 'client']
+              omit: ['id', 'model', 'levels', 'element', 'dataStore', 'client']
             }
           },
           writeMetaData: {
@@ -201,7 +205,7 @@ module.exports = (options) => {
             dataPath: 'result',
             collection,
             transform: {
-              omit: ['id', 'model', 'element', 'data', 'dataStore', 'client'],
+              omit: ['id', 'model', 'levels', 'element', 'data', 'dataStore', 'client'],
               merge: { filePath: '<%= id %>', convertedFilePath: '<%= id %>.json' }
             }
           },
@@ -209,7 +213,7 @@ module.exports = (options) => {
             match: { dataStore: { $eq: 'gridfs' } },
             hook: 'writeMongoBucket',
             key: `<%= id %>.json`,
-            bucket: '<%= model %>-<%= element %>',
+            bucket,
             metadata: { forecastTime: '<%= forecastTime.format() %>' }
           },
           emitEvent: { name: collection, pick: [ 'runTime', 'forecastTime' ] },
@@ -244,39 +248,22 @@ module.exports = (options) => {
           },
           createCollections: {
             hook: 'parallel',
-            hooks: (options.isobaric
-              ? options.elements.map(item => item.levels.map(level => ({
-                hook: 'createMongoCollection',
-                collection: `${options.model}-${item.element}-${level}`,
-                indices: indices(item),
-                // Required so that client is forwarded from job to tasks
-                clientPath: 'taskTemplate.client'
-              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
-              : options.elements.map(item => ({
-                hook: 'createMongoCollection',
-                collection: `${options.model}-${item.element}`,
-                indices: indices(item),
-                // Required so that client is forwarded from job to tasks
-                clientPath: 'taskTemplate.client'
-              }))
-            )
+            hooks: options.elements.map(item => (item.levels || [null]).map(level => ({
+              hook: 'createMongoCollection',
+              collection: (item.levels && item.levels.length > 1 ? `${options.model}-${item.element}-${level}` : `${options.model}-${item.element}`),
+              indices: indices(item),
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
           },
           createBuckets: {
             hook: 'parallel',
-            hooks: (options.isobaric
-              ? options.elements.filter(item => item.dataStore === 'gridfs').map(item => item.levels.map(level => ({
-                hook: 'createMongoBucket',
-                bucket: `${options.model}-${item.element}-${level}`,
-                // Required so that client is forwarded from job to tasks
-                clientPath: 'taskTemplate.client'
-              }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
-              : options.elements.filter(item => item.dataStore === 'gridfs').map(item => ({
-                hook: 'createMongoBucket',
-                bucket: `${options.model}-${item.element}`,
-                // Required so that client is forwarded from job to tasks
-                clientPath: 'taskTemplate.client'
-              }))
-            )
+            hooks: options.elements.filter(item => item.dataStore === 'gridfs').map(item => (item.levels || [null]).map(level => ({
+              hook: 'createMongoBucket',
+              bucket: (item.levels && item.levels.length > 1 ? `${options.model}-${item.element}-${level}` : `${options.model}-${item.element}`),
+              // Required so that client is forwarded from job to tasks
+              clientPath: 'taskTemplate.client'
+            }))).reduce((hooks, hooksForLevels) => hooks.concat(hooksForLevels), [])
           },
           // Common options for models, some will be setup on a per-model basis
           generateNwpTasks: Object.assign({
