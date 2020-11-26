@@ -1,9 +1,8 @@
 ARG TAG=latest
-FROM  weacast/weacast-arpege:${TAG}
+FROM  weacast/weacast-arome:${TAG}
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
-COPY job-arome.js .
 COPY jobfile-arome-france.js .
 
 CMD node /opt/krawler --cron "0 20,50 * * * *" jobfile-arome-france.js

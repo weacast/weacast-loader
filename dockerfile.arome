@@ -1,0 +1,7 @@
+ARG ARPEGE_TAG=latest
+FROM weacast/weacast-arpege:${ARPEGE_TAG}
+
+LABEL maintainer="Kalisio <contact@kalisio.xyz>"
+
+# Install the job
+COPY job-arome.js .
