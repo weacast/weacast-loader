@@ -1,7 +1,7 @@
 const path = require('path')
 const outputPath = path.join(__dirname, 'forecast-data')
 
-const defaults = {
+const defaults = (options) => ({
   id: 'weacast-gfs',
   model: 'gfs',
   dbUrl: process.env.DB_URL || 'mongodb://127.0.0.1:27017/weacast',
@@ -34,10 +34,10 @@ const defaults = {
   archiveId: (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
     `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
   cog: true
-}
+})
 
 module.exports = (options) => {
-  options = Object.assign({}, defaults, options)
+  options = Object.assign({}, defaults(options), options)
   const filepath = options.filepath
   const id = `${options.model}/${filepath}`
   const archiveId = options.archiveId
