@@ -23,6 +23,7 @@ const defaults = (options) => ({
   }, {
     element: 'precipitations',
     name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
+    accumulated: true,
     lowerLimit: 3 * 3600, // Accumulation from T to T-3H
     levels: [undefined] // Implicit surface level
   }, {
@@ -114,7 +115,7 @@ module.exports = (options) => {
           },
           // When the accumulation period X is less than 1 day suffix is PTXH otherwise the suffix is PXD.
           apply: {
-            match: { element: 'precipitations' },
+            match: { accumulated: true },
             function: (item) => {
               var accumulationPeriod = item.lowerLimit / 3600
               if (accumulationPeriod < 24) item.options.coverageid += '_PT' + accumulationPeriod + 'H'
