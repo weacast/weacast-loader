@@ -30,7 +30,7 @@ const defaults = (options) => ({
     levels: [ 'lev_2_m_above_ground' ]
   }],
   filepath: `<%= element %>/<%= level.split('_')[1] %>/<%= timeOffset / 3600 %>`,
-  collection: `<% if (levels.length > 1) { %> <%= model %>-<%= element %>-<%= level.split('_')[1] %> <% } else { %> <%= model %>-<%= element %> <% } %>`,
+  collection: `<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level.split('_')[1] %><% } else { %><%= model %>-<%= element %><% } %>`,
   archiveId: (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
     `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
   cog: true

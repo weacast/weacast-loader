@@ -33,7 +33,7 @@ const defaults = (options) => ({
   }],
   // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
   filepath: `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`,
-  collection: '<% if (levels.length > 1) { %> <%= model %>-<%= element %>-<%= level %> <% } else { %> <%= model %>-<%= element %> <% } %>',
+  collection: '<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level %><% } else { %><%= model %>-<%= element %><% } %>',
   archiveId: (options.isobaric ? 'archive/<%= model %>-isobaric' : 'archive/<%= model %>') +
     `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
   cog: true
