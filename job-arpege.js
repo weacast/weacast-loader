@@ -113,14 +113,21 @@ module.exports = (options) => {
           discardIf: {
             predicate: (item) => item.previousData.runTime && (item.runTime.valueOf() === item.previousData.runTime.getTime())
           },
+          // For surface cariables the height parameter is implicit, remove it from request as the WCS service does not like it
+          surface: {
+            hook: 'apply',
+            function: (item) => {
+              if (!item.level) delete item.options.subsets.height
+            }
+          },
           // When the accumulation period X is less than 1 day suffix is PTXH otherwise the suffix is PXD.
-          apply: {
+          accumulation: {
+            hook: 'apply',
             match: { accumulated: true },
             function: (item) => {
               var accumulationPeriod = item.lowerLimit / 3600
               if (accumulationPeriod < 24) item.options.coverageid += '_PT' + accumulationPeriod + 'H'
               else item.options.coverageid += '_P' + (accumulationPeriod / 24) + 'D'
-              delete item.options.subsets.height
             }
           }
         },
