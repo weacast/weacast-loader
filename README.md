@@ -1,6 +1,6 @@
 # weacast-loader
 
-[![Build Status](https://travis-ci.org/weacast/weacast-loader.png?branch=master)](https://travis-ci.org/weacast/weacast-loader)
+[![Build Status](https://travis-ci.com/weacast/weacast-loader.png?branch=master)](https://travis-ci.com/weacast/weacast-loader)
 [![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
 [![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
 [![Dependency Status](https://img.shields.io/david/weacast/weacast-loader.svg?style=flat-square)](https://david-dm.org/weacast/weacast-loader)
