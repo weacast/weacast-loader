@@ -1,5 +1,4 @@
 ARG KRAWLER_TAG=latest
-ARG GRIB2JSON_TAG=1.0.1
 
 # Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
@@ -7,22 +6,33 @@ FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 # Make the job image using the krawler image alias
 FROM node:12-buster-slim
 
+ARG GRIB2JSON_TAG=ecCodes
+ARG ECCODES_VERSION=2.19.1
+
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
-# Install Java
+# Install ecCodes tools
 RUN apt-get update -y
-# See http://debian.2.n7.nabble.com/Bug-863199-error-creating-symbolic-link-usr-share-man-man1-rmid-1-gz-dpkg-tmp-td4120571.html#a4283276
-RUN mkdir -p /usr/share/man/man1
-RUN apt install -y openjdk-11-jre-headless
-RUN apt-get clean
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-RUN $JAVA_HOME/bin/java -version
-
-# Install weacast-grib2json
-RUN npm install -g weacast-grib2json@${GRIB2JSON_TAG} --unsafe
+RUN apt install -y wget cmake libjpeg-dev libpng-dev libnetcdf-dev hdf5-tools libhdf5-dev libhdf5-serial-dev
+ENV DOWNLOAD_URL=https://confluence.ecmwf.int/download/attachments/45757960
+ENV ECCODES=eccodes-${ECCODES_VERSION}-Source
+WORKDIR /tmp
+RUN cd /tmp && wget --output-document=${ECCODES}.tar.gz ${DOWNLOAD_URL}/${ECCODES}.tar.gz?api=v2
+RUN tar -zxvf ${ECCODES}.tar.gz
+RUN cd ${ECCODES} && mkdir build && cd build && cmake -DENABLE_FORTRAN=OFF -DENABLE_PNG=ON .. && make -j2 && make install
 
 # Install GDAL
-RUN apt-get update && apt-get -y install gdal-bin
+RUN apt-get -y install gdal-bin
+
+# Install Git
+RUN apt-get -y install git
+
+# Install weacast-grib2json
+RUN git clone https://github.com/weacast/weacast-grib2json.git -b ${GRIB2JSON_TAG} --single-branch --depth 1
+RUN cd weacast-grib2json && npm install && npm link
+
+# Restore original working directory
+WORKDIR /opt/krawler
 
 # Copy Krawler
 COPY --from=krawler /opt/krawler /opt/krawler

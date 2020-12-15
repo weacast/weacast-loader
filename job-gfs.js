@@ -148,11 +148,13 @@ module.exports = (options) => {
             }
           },
           runCommand: {
-            command: `weacast-grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
+            //command: `weacast-grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
+            command: `weacast-grib2json -p values -P <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json ${outputPath}/<%= id %>`
           },
           // This will add grid data in a data field
           readJson: {
-            objectPath: '[0].data',
+            //objectPath: '[0].data',
+            objectPath: 'value',
             key: '<%= id %>.json'
           },
           transformJson: { dataPath: 'result', pick: ['id', 'model', 'element', 'level', 'levels', 'runTime', 'forecastTime', 'data', 'client'] },
