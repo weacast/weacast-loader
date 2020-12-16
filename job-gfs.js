@@ -149,7 +149,8 @@ module.exports = (options) => {
           },
           runCommand: {
             //command: `weacast-grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
-            command: `weacast-grib2json -p values -P <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json ${outputPath}/<%= id %>`
+            command: `weacast-grib2json -p values -P <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json ${outputPath}/<%= id %>`,
+            options: { maxBuffer: 8*1024*1024 }
           },
           // This will add grid data in a data field
           readJson: {

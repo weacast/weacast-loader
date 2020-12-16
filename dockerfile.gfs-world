@@ -5,4 +5,4 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
 COPY jobfile-gfs-world.js .
 
-CMD node /opt/krawler --run --cron "0 0,30 * * * *" jobfile-gfs-world.js
+CMD node /opt/krawler --cron "0 0,30 * * * *" jobfile-gfs-world.js
