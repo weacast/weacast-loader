@@ -42,13 +42,18 @@ module.exports = (options) => {
   const id = `${options.model}/${filepath}`
   const archiveId = options.archiveId
   const collection = options.collection
-  const indices = (item) => [
-    { x: 1, y: 1 },
-    { geometry: 1 },
-    { geometry: '2dsphere' },
-    [{ forecastTime: 1 }, { expireAfterSeconds: item.interval || options.nwp.interval }],
-    { forecastTime: 1, geometry: 1 }
-  ]
+  const indices = (item) => {
+    let expiration = item.interval || options.nwp.interval
+    // Extend the expiration period if we need to keep past data
+    if (options.nwp.keepPastRuns) expiration += options.nwp.oldestRunInterval
+    return [
+      { x: 1, y: 1 },
+      { geometry: 1 },
+      { geometry: '2dsphere' },
+      [{ forecastTime: 1 }, { expireAfterSeconds: expiration }],
+      { forecastTime: 1, geometry: 1 }
+    ]
+  }
   // Check if we archive on S3
   let stores = [{
     id: 'fs',
