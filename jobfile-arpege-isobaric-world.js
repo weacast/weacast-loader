@@ -15,7 +15,7 @@ module.exports = createJob({
     interval: 3 * 3600,             // Steps of 3h
     lowerLimit: 0 * 3600,           // From T0
     // upperLimit: 3 * 3600,           // Up to T0 + 3h for testing
-    upperLimit: 102 * 3600          // Up to T0+102
+    upperLimit: process.env.UPPER_LIMIT || (102 * 3600)          // Up to T0+102
   },
   elements: [{
     element: 'u-wind',
