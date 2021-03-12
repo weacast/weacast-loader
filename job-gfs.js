@@ -88,7 +88,7 @@ module.exports = (options) => {
       // Common options for models, some will be setup on a per-model basis
       options: Object.assign({
         url: 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl',
-        dir: '/gfs.<%= runTime.format(\'YYYYMMDD/HH\') %>',
+        dir: '/gfs.<%= runTime.format(\'YYYYMMDD/HH\') %>/atmos',
         file: 'gfs.t<%= runTime.format(\'HH\') %>z.pgrb2full.0p50.f<%= (timeOffset / 3600).toString().padStart(3, \'0\') %>',
         subregion: null,
         leftlon: options.bounds[0],
