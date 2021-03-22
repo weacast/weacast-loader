@@ -178,6 +178,47 @@ describe('weacast-loader', () => {
     expect(typeof loader.createGfsJob).to.equal('function')
   })
 
+  it('run GFS WORLD dowloader', async () => {
+    const tasks = await krawler(gfsWorldJob)
+    expect(tasks.length).to.equal(2)
+    // Check intermediate products have been produced and final product are here
+    expectFiles('gfs-world', 'temperature', 'surface', '3', true)
+    await expectResults('gfs-world-temperature')
+    await expectDataResults('gfs-world-temperature')
+    // Tiles
+    await expectTileResults('gfs-world-temperature')
+    fs.emptyDirSync(outputPath)
+  })
+  // Let enough time to process
+  .timeout(30000)
+
+  it('run GFS WORLD dowloader once again', async () => {
+    const tasks = await krawler(gfsWorldJob)
+    expect(tasks.length).to.equal(2)
+    // Check nothing has been produced because DB is already up-to-date
+    expectFiles('gfs-world', 'temperature', 'surface', '3', false)
+    await expectResults('gfs-world-temperature')
+    await expectDataResults('gfs-world-temperature')
+    // Tiles
+    await expectTileResults('gfs-world-temperature')
+  })
+  // Let enough time to process
+  .timeout(10000)
+
+  it('run GFS ISOBARIC WORLD dowloader', async () => {
+    const tasks = await krawler(gfsIsobaricWorldJob)
+    expect(tasks.length).to.equal(2)
+    // Check intermediate products have been produced and final product are here
+    expectFiles('gfs-world', 'temperature-isobaric', '1000', '3', true)
+    await expectResults('gfs-world-temperature-isobaric-1000')
+    await expectDataResults('gfs-world-temperature-isobaric-1000')
+    // Tiles
+    await expectTileResults('gfs-world-temperature-isobaric-1000')
+    fs.emptyDirSync(outputPath)
+  })
+  // Let enough time to process
+  .timeout(30000)
+  
   it('run ARPEGE WORLD dowloader', async () => {
     const tasks = await krawler(arpegeWorldJob)
     expect(tasks.length).to.equal(2)
@@ -313,47 +354,6 @@ describe('weacast-loader', () => {
   })
   // Let enough time to process
   .timeout(10000)
-
-  it('run GFS WORLD dowloader', async () => {
-    const tasks = await krawler(gfsWorldJob)
-    expect(tasks.length).to.equal(2)
-    // Check intermediate products have been produced and final product are here
-    expectFiles('gfs-world', 'temperature', 'surface', '3', true)
-    await expectResults('gfs-world-temperature')
-    await expectDataResults('gfs-world-temperature')
-    // Tiles
-    await expectTileResults('gfs-world-temperature')
-    fs.emptyDirSync(outputPath)
-  })
-  // Let enough time to process
-  .timeout(30000)
-
-  it('run GFS WORLD dowloader once again', async () => {
-    const tasks = await krawler(gfsWorldJob)
-    expect(tasks.length).to.equal(2)
-    // Check nothing has been produced because DB is already up-to-date
-    expectFiles('gfs-world', 'temperature', 'surface', '3', false)
-    await expectResults('gfs-world-temperature')
-    await expectDataResults('gfs-world-temperature')
-    // Tiles
-    await expectTileResults('gfs-world-temperature')
-  })
-  // Let enough time to process
-  .timeout(10000)
-
-  it('run GFS ISOBARIC WORLD dowloader', async () => {
-    const tasks = await krawler(gfsIsobaricWorldJob)
-    expect(tasks.length).to.equal(2)
-    // Check intermediate products have been produced and final product are here
-    expectFiles('gfs-world', 'temperature-isobaric', '1000', '3', true)
-    await expectResults('gfs-world-temperature-isobaric-1000')
-    await expectDataResults('gfs-world-temperature-isobaric-1000')
-    // Tiles
-    await expectTileResults('gfs-world-temperature-isobaric-1000')
-    fs.emptyDirSync(outputPath)
-  })
-  // Let enough time to process
-  .timeout(30000)
 
   // Cleanup
   after(async () => {
