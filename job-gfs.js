@@ -122,12 +122,12 @@ module.exports = (options) => {
             // First convert from Grib to GeoTiff
             // Then create a replication from [0, 360] to [-360, 0] and a VRT covering [-360, 360]
             // Last extract the portion between [-180, 180] from this VRT
-            `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>_raw`,
-            `gdal_translate -a_ullr -360.25 90.25 -0.25 -90.25 ${outputPath}/<%= id %>_raw ${outputPath}/<%= id %>_shifted`,
-            `gdalbuildvrt ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_raw ${outputPath}/<%= id %>_shifted`,
-            `gdal_translate ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_180.vrt -projwin -180.25 90.25 179.75 -90.25 -of VRT`,
-            `gdalwarp -overwrite -ot Float32 -wo NUM_THREADS=6 -wo SOURCE_EXTRA=100 ${outputPath}/<%= id %>_180.vrt ${outputPath}/<%= id %>_180.tif`,
-            `gdal_translate ${outputPath}/<%= id %>_180.tif ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
+              `gdal_translate ${outputPath}/<%= id %> ${outputPath}/<%= id %>_raw`,
+              `gdal_translate -a_ullr -360.25 90.25 -0.25 -90.25 ${outputPath}/<%= id %>_raw ${outputPath}/<%= id %>_shifted`,
+              `gdalbuildvrt ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_raw ${outputPath}/<%= id %>_shifted`,
+              `gdal_translate ${outputPath}/<%= id %>.vrt ${outputPath}/<%= id %>_180.vrt -projwin -180.25 90.25 179.75 -90.25 -of VRT`,
+              `gdalwarp -overwrite -ot Float32 -wo NUM_THREADS=6 -wo SOURCE_EXTRA=100 ${outputPath}/<%= id %>_180.vrt ${outputPath}/<%= id %>_180.tif`,
+              `gdal_translate ${outputPath}/<%= id %>_180.tif ${outputPath}/<%= id %>.tif -ot Float32 -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS -co TILED=YES -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COPY_SRC_OVERVIEWS=YES`
             ]
           },
           processRawData: {
@@ -140,7 +140,8 @@ module.exports = (options) => {
             match: { predicate: () => !options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>', store: 'fs' },
-            output: { key: `${archiveId}.grib`, store: 's3',
+            output: { key: `${archiveId}.grib`,
+              store: 's3',
               params: { ACL: 'public-read' }
             }
           },
@@ -148,7 +149,8 @@ module.exports = (options) => {
             match: { predicate: () => options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>.tif', store: 'fs' },
-            output: { key: `${archiveId}.cog`, store: 's3',
+            output: { key: `${archiveId}.cog`,
+              store: 's3',
               params: { ACL: 'public-read' }
             }
           },
