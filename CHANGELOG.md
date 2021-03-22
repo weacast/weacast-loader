@@ -1,5 +1,25 @@
 # Changelog
 
+## [v1.5.0](https://github.com/weacast/weacast-loader/tree/v1.5.0) (2021-03-22)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.4.2...v1.5.0)
+
+**Implemented enhancements:**
+
+- Support GFS v16 [\#38](https://github.com/weacast/weacast-loader/issues/38)
+- Allow to keep data for past runs [\#37](https://github.com/weacast/weacast-loader/issues/37)
+- Add a docker image dedicated to AROME [\#33](https://github.com/weacast/weacast-loader/issues/33)
+- Update loaders to manage multiple elevation levels [\#32](https://github.com/weacast/weacast-loader/issues/32)
+
+**Fixed bugs:**
+
+- Upper limit exceeded for elements with a oldest run interval [\#34](https://github.com/weacast/weacast-loader/issues/34)
+
+**Merged pull requests:**
+
+- Bump ini from 1.3.5 to 1.3.7 [\#35](https://github.com/weacast/weacast-loader/pull/35) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.10 to 4.17.20 [\#31](https://github.com/weacast/weacast-loader/pull/31) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.4.2](https://github.com/weacast/weacast-loader/tree/v1.4.2) (2020-10-09)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.4.1...v1.4.2)
