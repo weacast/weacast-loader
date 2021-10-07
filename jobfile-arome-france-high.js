@@ -6,7 +6,7 @@ module.exports = createJob({
   model: 'arome-france-high',
   dataStore: 'gridfs',
   request: {
-    url: 'https://geoservices.meteofrance.fr/services/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS'
+    url: 'https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/GetCoverage'
   },
   bounds: [-8, 38, 12, 53],
   origin: [-8, 53],
