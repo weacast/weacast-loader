@@ -210,10 +210,10 @@ describe('weacast-loader', () => {
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
     expectFiles('gfs-world', 'temperature-isobaric', '1000', '3', true)
-    await expectResults('gfs-world-temperature-isobaric-1000')
-    await expectDataResults('gfs-world-temperature-isobaric-1000')
+    await expectResults('gfs-world-temperature-isobaric')
+    await expectDataResults('gfs-world-temperature-isobaric')
     // Tiles
-    await expectTileResults('gfs-world-temperature-isobaric-1000')
+    await expectTileResults('gfs-world-temperature-isobaric')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -251,10 +251,10 @@ describe('weacast-loader', () => {
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
     expectFiles('arpege-world', 'temperature-isobaric', '1000', '3', true)
-    await expectResults('arpege-world-temperature-isobaric-1000')
-    await expectDataResults('arpege-world-temperature-isobaric-1000')
+    await expectResults('arpege-world-temperature-isobaric')
+    await expectDataResults('arpege-world-temperature-isobaric')
     // Tiles
-    await expectTileResults('arpege-world-temperature-isobaric-1000')
+    await expectTileResults('arpege-world-temperature-isobaric')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -292,10 +292,10 @@ describe('weacast-loader', () => {
     expect(tasks.length).to.equal(2)
     // Check intermediate products have been produced and final product are here
     expectFiles('arpege-europe', 'temperature-isobaric', '1000', '1', true)
-    await expectResults('arpege-europe-temperature-isobaric-1000')
-    await expectDataResults('arpege-europe-temperature-isobaric-1000')
+    await expectResults('arpege-europe-temperature-isobaric')
+    await expectDataResults('arpege-europe-temperature-isobaric')
     // Tiles
-    await expectTileResults('arpege-europe-temperature-isobaric-1000')
+    await expectTileResults('arpege-europe-temperature-isobaric')
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
@@ -356,7 +356,9 @@ describe('weacast-loader', () => {
   .timeout(10000)
 
   // Cleanup
-  after(async () => {
+  after(async function () {
+    // Let enough time to process
+    this.timeout(5000)
     fs.emptyDirSync(outputPath)
     await db.dropDatabase()
     await dbClient.close()
