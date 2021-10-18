@@ -1,8 +1,12 @@
 # Changelog
 
-## [Unreleased](https://github.com/weacast/weacast-loader/tree/HEAD)
+## [v1.6.0](https://github.com/weacast/weacast-loader/tree/v1.6.0) (2021-10-18)
 
-[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.0...HEAD)
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.5.1...v1.6.0)
+
+**Implemented enhancements:**
+
+- Upgrade to use the new Météo France API [\#45](https://github.com/weacast/weacast-loader/issues/45)
 
 **Merged pull requests:**
 
@@ -12,14 +16,6 @@
 - Bump tar from 4.4.6 to 4.4.15 [\#41](https://github.com/weacast/weacast-loader/pull/41) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump lodash from 4.17.20 to 4.17.21 [\#40](https://github.com/weacast/weacast-loader/pull/40) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump y18n from 4.0.0 to 4.0.1 [\#39](https://github.com/weacast/weacast-loader/pull/39) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-## [v1.6.0](https://github.com/weacast/weacast-loader/tree/v1.6.0) (2021-10-18)
-
-[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.5.1...v1.6.0)
-
-**Implemented enhancements:**
-
-- Upgrade to use the new Météo France API [\#45](https://github.com/weacast/weacast-loader/issues/45)
 
 ## [v1.5.1](https://github.com/weacast/weacast-loader/tree/v1.5.1) (2021-03-22)
 
