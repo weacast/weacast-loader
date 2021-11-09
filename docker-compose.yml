@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: dockerfile.arpege-world
     container_name: weacast-arpege-world
-    image: weacast/weacast-arpege-world
+    image: weacast/weacast-arpege:world-latest
     links:
       - mongodb-weacast:mongodb
     networks:
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: dockerfile.arpege-europe
     container_name: weacast-arpege-europe
-    image: weacast/weacast-arpege-europe
+    image: weacast/weacast-arpege:europe-latest
     links:
       - mongodb-weacast:mongodb
     networks:
@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: dockerfile.arome-france
     container_name: weacast-arome-france
-    image: weacast/weacast-arome-france
+    image: weacast/weacast-arome:france-latest
     links:
       - mongodb-weacast:mongodb
     networks:
@@ -45,7 +45,7 @@ services:
       context: .
       dockerfile: dockerfile.arome-france-high
     container_name: weacast-arome-france-high
-    image: weacast/weacast-arome-france-high
+    image: weacast/weacast-arome:france-high-latest
     links:
       - mongodb-weacast:mongodb
     networks:
