@@ -1,4 +1,5 @@
 const path = require('path')
+const util = require('util')
 const outputPath = path.join(__dirname, 'forecast-data')
 
 const defaults = (options) => ({
@@ -85,7 +86,7 @@ module.exports = (options) => {
     id: options.id,
     store: 'fs',
     options: {
-      workersLimit: options.workersLimit || 2,
+      workersLimit: process.env.WORKERS_LIMIT || options.workersLimit || 2,
       faultTolerant: true
     },
     taskTemplate: {
@@ -250,7 +251,14 @@ module.exports = (options) => {
               unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } }
             }
           },
-          clearData: {} // This will free memory for grid data
+          clearData: {}, // This will free memory for grid data
+          // Avoid hitting rate limit by adding a delay between requests
+          waitForNextRequest: {
+            hook: 'apply',
+            function: async () => {
+              await util.promisify(setTimeout)(process.env.REQUEST_DELAY || 3000)
+            }
+          }
         }
       },
       jobs: {
