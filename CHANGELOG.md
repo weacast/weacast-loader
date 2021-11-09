@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.6.1](https://github.com/weacast/weacast-loader/tree/v1.6.1) (2021-11-09)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.0...v1.6.1)
+
+**Implemented enhancements:**
+
+- Implement a strategy to avoid rate limiting [\#46](https://github.com/weacast/weacast-loader/issues/46)
+
 ## [v1.6.0](https://github.com/weacast/weacast-loader/tree/v1.6.0) (2021-10-18)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.5.1...v1.6.0)
