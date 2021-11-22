@@ -86,7 +86,7 @@ module.exports = (options) => {
     id: options.id,
     store: 'fs',
     options: {
-      workersLimit: process.env.WORKERS_LIMIT || options.workersLimit || 2,
+      workersLimit: (process.env.WORKERS_LIMIT ? Number(process.env.WORKERS_LIMIT) : (options.workersLimit || 2)),
       faultTolerant: true
     },
     taskTemplate: {
