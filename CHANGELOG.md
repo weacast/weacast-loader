@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.6.2](https://github.com/weacast/weacast-loader/tree/v1.6.2) (2021-11-22)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.1...v1.6.2)
+
+**Implemented enhancements:**
+
+- Update CRON and make it configurable [\#47](https://github.com/weacast/weacast-loader/issues/47)
+
 ## [v1.6.1](https://github.com/weacast/weacast-loader/tree/v1.6.1) (2021-11-09)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.0...v1.6.1)
