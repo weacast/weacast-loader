@@ -190,7 +190,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run GFS WORLD dowloader once again', async () => {
     const tasks = await krawler(gfsWorldJob)
@@ -217,7 +217,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run ARPEGE WORLD dowloader', async () => {
     const tasks = await krawler(arpegeWorldJob)
@@ -231,7 +231,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run ARPEGE WORLD downloader once again', async () => {
     const tasks = await krawler(arpegeWorldJob)
@@ -258,7 +258,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run ARPEGE EUROPE downloader', async () => {
     const tasks = await krawler(arpegeEuropeJob)
@@ -272,7 +272,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run ARPEGE EUROPE downloader once again', async () => {
     const tasks = await krawler(arpegeEuropeJob)
@@ -299,7 +299,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run AROME FRANCE downloader', async () => {
     const tasks = await krawler(aromeFranceJob)
@@ -313,7 +313,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(30000)
+  .timeout(45000)
 
   it('run AROME FRANCE downloader once again', async () => {
     const tasks = await krawler(aromeFranceJob)

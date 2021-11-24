@@ -103,6 +103,13 @@ module.exports = (options) => {
     hooks: {
       tasks: {
         before: {
+          // Avoid hitting rate limit by adding a delay between requests
+          waitBeforeRequest: {
+            hook: 'apply',
+            function: async () => {
+              await util.promisify(setTimeout)(process.env.REQUEST_DELAY || 3000)
+            }
+          },
           readMongoCollection: {
             collection,
             dataPath: 'data.previousData',
@@ -208,14 +215,7 @@ module.exports = (options) => {
             match: { predicate: (item) => options.tileResolution },
             transform: { unitMapping: { forecastTime: { asDate: 'utc' }, runTime: { asDate: 'utc' } } }
           },
-          clearData: {}, // This will free memory for grid data
-          // Avoid hitting rate limit by adding a delay between requests
-          waitForNextRequest: {
-            hook: 'apply',
-            function: async () => {
-              await util.promisify(setTimeout)(process.env.REQUEST_DELAY || 3000)
-            }
-          }
+          clearData: {} // This will free memory for grid data
         }
       },
       jobs: {
