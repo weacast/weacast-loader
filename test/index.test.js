@@ -203,7 +203,7 @@ describe('weacast-loader', () => {
     await expectTileResults('gfs-world-temperature')
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(60000)
 
   it('run GFS ISOBARIC WORLD dowloader', async () => {
     const tasks = await krawler(gfsIsobaricWorldJob)
@@ -244,7 +244,7 @@ describe('weacast-loader', () => {
     await expectTileResults('arpege-world-temperature')
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(60000)
 
   it('run ARPEGE ISOBARIC WORLD dowloader', async () => {
     const tasks = await krawler(arpegeIsobaricWorldJob)
@@ -285,7 +285,7 @@ describe('weacast-loader', () => {
     await expectTileResults('arpege-europe-temperature')
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(60000)
 
   it('run ARPEGE ISOBARIC EUROPE downloader', async () => {
     const tasks = await krawler(arpegeIsobaricEuropeJob)
@@ -326,7 +326,7 @@ describe('weacast-loader', () => {
     await expectTileResults('arome-france-temperature')
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(60000)
 
   it('run AROME FRANCE HIGH downloader', async () => {
     const tasks = await krawler(aromeFranceHighJob)
@@ -353,12 +353,12 @@ describe('weacast-loader', () => {
     await expectTileResults('arome-france-high-temperature')
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(60000)
 
   // Cleanup
   after(async function () {
     // Let enough time to process
-    this.timeout(5000)
+    this.timeout(30000)
     fs.emptyDirSync(outputPath)
     await db.dropDatabase()
     await dbClient.close()
