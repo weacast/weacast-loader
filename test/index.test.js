@@ -340,7 +340,7 @@ describe('weacast-loader', () => {
     fs.emptyDirSync(outputPath)
   })
   // Let enough time to process
-  .timeout(180000)
+  .timeout(360000)
 
   it('run AROME FRANCE HIGH downloader once again', async () => {
     const tasks = await krawler(aromeFranceHighJob)
