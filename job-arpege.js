@@ -33,7 +33,7 @@ const defaults = (options) => ({
     levels: [ 2 ]
   }],
   // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
-  filepath: `<%= element %>/<%= level ? level : 'surface' %>/<%= timeOffset / 3600 %>`,
+  filepath: `<%= element %>/<%= level ? level : 'surface' %>/<%= runTime.format('HH') %>/<%= timeOffset / 3600 %>`,
   collection: '<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level %><% } else { %><%= model %>-<%= element %><% } %>',
   archiveId: (options.isobaric ? 'archive/<%= model %>-isobaric' : 'archive/<%= model %>') +
     `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
@@ -47,10 +47,11 @@ module.exports = (options) => {
   const archiveId = options.archiveId
   const collection = options.collection
   const bucket = collection
+  const keepPastRuns = options.nwp.keepPastRuns
   const indices = (item) => {
     let expiration = item.interval || options.nwp.interval
     // Extend the expiration period if we need to keep past data
-    if (options.nwp.keepPastRuns) expiration += options.nwp.oldestRunInterval
+    if (keepPastRuns) expiration += options.nwp.oldestRunInterval
     return [
       { x: 1, y: 1 },
       { geometry: 1 },
@@ -118,7 +119,10 @@ module.exports = (options) => {
           readMongoCollection: {
             collection,
             dataPath: 'data.previousData',
-            query: { forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
+            // When keeping only the most recent forecast check if it comes from an older run time
+            // When keeping all run times check if it already exist for the current run time
+            query: Object.assign({ forecastTime: '<%= forecastTime.format() %>', geometry: { $exists: false } },
+              keepPastRuns ? { runTime: '<%= runTime.format() %>' } : {}),
             project: { _id: 1, runTime: 1, forecastTime: 1 },
             transform: { asObject: true }
           },
@@ -210,6 +214,8 @@ module.exports = (options) => {
           computeStatistics: { dataPath: 'result.data', min: 'minValue', max: 'maxValue' },
           // Erase previous data if any
           deleteMongoCollection: {
+            // Do not delete any previous data if keeping all run times
+            match: { predicate: () => !keepPastRuns },
             collection,
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
