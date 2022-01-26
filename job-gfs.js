@@ -45,7 +45,7 @@ module.exports = (options) => {
   const collection = options.collection
   const keepPastRuns = options.nwp.keepPastRuns
   const indices = (item) => {
-    let expiration = item.interval || options.nwp.interval
+    let expiration = item.ttl || options.nwp.ttl || item.interval || options.nwp.interval
     // Extend the expiration period if we need to keep past data
     if (keepPastRuns) expiration += options.nwp.oldestRunInterval
     return [
