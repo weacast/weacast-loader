@@ -14,6 +14,11 @@ services:
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
       - METEO_FRANCE_TOKEN
+      - UPPER_LIMIT
+      - S3_ACCESS_KEY
+      - S3_SECRET_ACCESS_KEY
+      - S3_BUCKET
+      - S3_ENDPOINT
   weacast-arpege-europe:
     build:
       context: .
@@ -27,6 +32,11 @@ services:
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
       - METEO_FRANCE_TOKEN
+      - UPPER_LIMIT
+      - S3_ACCESS_KEY
+      - S3_SECRET_ACCESS_KEY
+      - S3_BUCKET
+      - S3_ENDPOINT
   weacast-arome-france:
     build:
       context: .
@@ -40,6 +50,11 @@ services:
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
       - METEO_FRANCE_TOKEN
+      - UPPER_LIMIT
+      - S3_ACCESS_KEY
+      - S3_SECRET_ACCESS_KEY
+      - S3_BUCKET
+      - S3_ENDPOINT
   weacast-arome-france-high:
     build:
       context: .
@@ -53,18 +68,28 @@ services:
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
       - METEO_FRANCE_TOKEN
+      - UPPER_LIMIT
+      - S3_ACCESS_KEY
+      - S3_SECRET_ACCESS_KEY
+      - S3_BUCKET
+      - S3_ENDPOINT
   weacast-gfs-world:
     build:
       context: .
       dockerfile: dockerfile.gfs-world
     container_name: weacast-gfs-world
-    image: weacast/weacast-gfs-world
+    image: weacast/weacast-gfs:world-latest
     links:
       - mongodb-weacast:mongodb
     networks:
       - weacast
     environment:
       - DB_URL=mongodb://mongodb:27017/weacast
+      - UPPER_LIMIT
+      - S3_ACCESS_KEY
+      - S3_SECRET_ACCESS_KEY
+      - S3_BUCKET
+      - S3_ENDPOINT
   mongodb-weacast:
     container_name: mongodb-weacast
     image: mongo:3
