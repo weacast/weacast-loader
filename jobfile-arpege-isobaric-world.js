@@ -6,8 +6,8 @@ const runInterval = 6 * 3600
 const oldestRunInterval = (process.env.OLDEST_RUN_INTERVAL ? Number(process.env.OLDEST_RUN_INTERVAL) : 24 * 3600)
 // Don't keep past runs
 const keepPastRuns = process.env.KEEP_PAST_RUNS || false
-// Steps of 1h
-const interval = 1 * 3600
+// Steps of 3h
+const interval = 3 * 3600
 // Expand data TTL if required
 const ttl = (process.env.TTL ? Number(process.env.TTL) : undefined)
 // From T0
