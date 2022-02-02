@@ -1,7 +1,7 @@
 {
   "name": "weacast-loader",
   "description": "Weather forecast model data dowloader for Weacast",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "homepage": "https://github.com/weacast/weacast-loader",
   "keywords": [
     "weacast",
