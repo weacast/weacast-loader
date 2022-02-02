@@ -113,7 +113,7 @@ module.exports = (options) => {
           waitBeforeRequest: {
             hook: 'apply',
             function: async () => {
-              await util.promisify(setTimeout)(process.env.REQUEST_DELAY || 3000)
+              await util.promisify(setTimeout)(process.env.REQUEST_DELAY ? Number(process.env.REQUEST_DELAY) : 3000)
             }
           },
           readMongoCollection: {
