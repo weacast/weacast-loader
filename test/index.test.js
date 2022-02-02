@@ -84,11 +84,17 @@ describe('weacast-loader', () => {
   })
 
   function expectFiles (model, element, level, interval, present) {
-    // Check intermediate products have been produced and final product are here
-    expect(fs.existsSync(path.join(outputPath, model, element, level, '0'))).to.equal(present)
-    expect(fs.existsSync(path.join(outputPath, model, element, level, interval))).to.equal(present)
-    expect(fs.existsSync(path.join(outputPath, model, element, level, '0.json'))).to.equal(present)
-    expect(fs.existsSync(path.join(outputPath, model, element, level, interval + '.json'))).to.equal(present)
+    // Check intermediate products have been produced and final product are here or not
+    if (!present) {
+      expect(fs.existsSync(path.join(outputPath, model, element, level))).to.equal(present)
+    } else {
+      // We have an intermediate level with the run time that we cannot know in advance
+      const dirs = fs.readdirSync(path.join(outputPath, model, element, level))
+      expect(fs.existsSync(path.join(outputPath, model, element, level, dirs[0], '0'))).to.equal(present)
+      expect(fs.existsSync(path.join(outputPath, model, element, level, dirs[0], interval))).to.equal(present)
+      expect(fs.existsSync(path.join(outputPath, model, element, level, dirs[0], '0.json'))).to.equal(present)
+      expect(fs.existsSync(path.join(outputPath, model, element, level, dirs[0], interval + '.json'))).to.equal(present)
+    }
   }
 
   async function expectResults (collectionName) {
