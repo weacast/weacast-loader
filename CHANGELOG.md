@@ -1,5 +1,27 @@
 # Changelog
 
+## [v1.7.0](https://github.com/weacast/weacast-loader/tree/v1.7.0) (2022-02-02)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.3...v1.7.0)
+
+**Implemented enhancements:**
+
+- Use HTTPS endpoint for GFS grib filter service [\#52](https://github.com/weacast/weacast-loader/issues/52)
+- Make the TTL option configurable from environment [\#51](https://github.com/weacast/weacast-loader/issues/51)
+- Make the keep past runs option configurable from environment [\#49](https://github.com/weacast/weacast-loader/issues/49)
+
+**Fixed bugs:**
+
+- Make the keep past runs option work correctly [\#50](https://github.com/weacast/weacast-loader/issues/50)
+
+## [v1.6.3](https://github.com/weacast/weacast-loader/tree/v1.6.3) (2021-11-25)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.2...v1.6.3)
+
+**Fixed bugs:**
+
+- Rate limiting strategy does not apply on errors [\#48](https://github.com/weacast/weacast-loader/issues/48)
+
 ## [v1.6.2](https://github.com/weacast/weacast-loader/tree/v1.6.2) (2021-11-22)
 
 [Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.1...v1.6.2)
