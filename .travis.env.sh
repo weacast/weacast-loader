@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export GTIFF2JSON_TAG=v$(node -p -e "require('./package.json').peerDependencies['weacast-gtiff2json']")
-export GRIB2JSON_TAG=v$(node -p -e "require('./package.json').peerDependencies['weacast-grib2json']")
+export GTIFF2JSON_TAG=v$(node -p -e "require('./package.json').peerDependencies['@weacast/gtiff2json']")
+export GRIB2JSON_TAG=v$(node -p -e "require('./package.json').peerDependencies['@weacast/grib2json']")
 
 # Build docker with version number only on release
 if [[ -z "$TRAVIS_TAG" ]]

@@ -7,4 +7,4 @@ ENV CRON="0 45 * * * *"
 
 COPY jobfile-arpege-isobaric-europe.js .
 
-CMD node /opt/krawler --cron "$CRON" jobfile-arpege-isobaric-europe.js
+CMD krawler --cron "$CRON" jobfile-arpege-isobaric-europe.js

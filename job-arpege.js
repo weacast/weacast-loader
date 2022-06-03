@@ -1,5 +1,8 @@
-const path = require('path')
-const util = require('util')
+import path from 'path'
+import util from 'util'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const outputPath = path.join(__dirname, 'forecast-data')
 
 const defaults = (options) => ({
@@ -12,15 +15,15 @@ const defaults = (options) => ({
   elements: [{
     element: 'u-wind',
     name: 'U_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
-    levels: [ 10 ]
+    levels: [10]
   }, {
     element: 'gust',
     name: 'WIND_SPEED_GUST__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
-    levels: [ 10 ]
+    levels: [10]
   }, {
     element: 'v-wind',
     name: 'V_COMPONENT_OF_WIND__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
-    levels: [ 10 ]
+    levels: [10]
   }, {
     element: 'precipitations',
     name: 'TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE',
@@ -30,17 +33,17 @@ const defaults = (options) => ({
   }, {
     element: 'temperature',
     name: 'TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND',
-    levels: [ 2 ]
+    levels: [2]
   }],
   // By naming files locally by the number of hours from run time we reuse the same names and avoid having to purge
-  filepath: `<%= element %>/<%= level ? level : 'surface' %>/<%= runTime.format('HH') %>/<%= timeOffset / 3600 %>`,
+  filepath: '<%= element %>/<%= level ? level : \'surface\' %>/<%= runTime.format(\'HH\') %>/<%= timeOffset / 3600 %>',
   collection: '<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level %><% } else { %><%= model %>-<%= element %><% } %>',
   archiveId: (options.isobaric ? 'archive/<%= model %>-isobaric' : 'archive/<%= model %>') +
-    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level ? level : 'surface' %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
+    '/<%= runTime.format(\'YYYY/MM/DD/HH\') %>/<%= element %>/<%= level ? level : \'surface\' %>/<%= forecastTime.format(\'YYYY-MM-DD-HH\') %>',
   cog: true
 })
 
-module.exports = (options) => {
+export default (options) => {
   options = Object.assign({}, defaults(options), options)
   const filepath = options.filepath
   const id = `${options.model}/${filepath}`
@@ -63,7 +66,7 @@ module.exports = (options) => {
   // Forward global data store to elements
   if (options.dataStore) options.elements.forEach(element => Object.assign(element, { dataStore: options.dataStore }))
   // Check if we archive on S3
-  let stores = [{
+  const stores = [{
     id: 'fs',
     options: {
       path: outputPath
@@ -142,7 +145,7 @@ module.exports = (options) => {
             hook: 'apply',
             match: { accumulated: true },
             function: (item) => {
-              var accumulationPeriod = item.lowerLimit / 3600
+              const accumulationPeriod = item.lowerLimit / 3600
               if (accumulationPeriod < 24) item.options.coverageid += '_PT' + accumulationPeriod + 'H'
               else item.options.coverageid += '_P' + (accumulationPeriod / 24) + 'D'
             }
@@ -174,7 +177,8 @@ module.exports = (options) => {
             match: { predicate: () => !options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>', store: 'fs' },
-            output: { key: `${archiveId}.tif`,
+            output: {
+              key: `${archiveId}.tif`,
               store: 's3',
               params: { ACL: 'public-read' }
             }
@@ -183,13 +187,14 @@ module.exports = (options) => {
             match: { predicate: () => options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>.tif', store: 'fs' },
-            output: { key: `${archiveId}.cog`,
+            output: {
+              key: `${archiveId}.cog`,
               store: 's3',
               params: { ACL: 'public-read' }
             }
           },
           runCommand: {
-            command: `weacast-gtiff2json ${outputPath}/<%= id %> -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
+            command: `gtiff2json ${outputPath}/<%= id %> -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
           },
           // This will add grid data in a data field
           readJson: {
@@ -241,11 +246,11 @@ module.exports = (options) => {
           writeRawFile: {
             match: { dataStore: { $eq: 'gridfs' } },
             hook: 'writeMongoBucket',
-            key: `<%= id %>.json`,
+            key: '<%= id %>.json',
             bucket,
             metadata: { forecastTime: '<%= forecastTime.format() %>' }
           },
-          emitEvent: { name: collection, pick: [ 'runTime', 'forecastTime' ] },
+          emitEvent: { name: collection, pick: ['runTime', 'forecastTime'] },
           tileGrid: {
             match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',

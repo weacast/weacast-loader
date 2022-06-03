@@ -7,4 +7,4 @@ ENV CRON="0 0 * * * *"
 
 COPY jobfile-arome-france.js .
 
-CMD node /opt/krawler --cron "$CRON" jobfile-arome-france.js
+CMD krawler --cron "$CRON" jobfile-arome-france.js

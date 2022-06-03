@@ -1,4 +1,4 @@
-const createJob = require('./job-gfs')
+import createJob from './job-gfs.js'
 
 // Produced every 6h
 const runInterval = 6 * 3600
@@ -16,7 +16,7 @@ const lowerLimit = 0
 const upperLimit = (process.env.UPPER_LIMIT ? Number(process.env.UPPER_LIMIT) : 240 * 3600)
 
 // Setup job name, model name, bounds and generation parameters
-module.exports = createJob({
+export default createJob({
   id: 'weacast-gfs-isobaric-world',
   model: 'gfs-world',
   bounds: [0, -90, 360, 90],
@@ -36,15 +36,15 @@ module.exports = createJob({
   elements: [{
     element: 'u-wind',
     name: 'var_UGRD',
-    levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
+    levels: ['lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb']
   }, {
     element: 'v-wind',
     name: 'var_VGRD',
-    levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
+    levels: ['lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb']
   }, {
     element: 'temperature',
     name: 'var_TMP',
-    levels: [ 'lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb' ]
+    levels: ['lev_1000_mb', 'lev_700_mb', 'lev_450_mb', 'lev_300_mb', 'lev_200_mb']
   }],
   isobaric: true
 })

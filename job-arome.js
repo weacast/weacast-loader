@@ -1,4 +1,4 @@
 // ARPEGE/AROME interfaces are similar
-const createJob = require('./job-arpege')
+import createJob from './job-arpege.js'
 
-module.exports = createJob
+export default createJob

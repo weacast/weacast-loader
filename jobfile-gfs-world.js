@@ -1,4 +1,4 @@
-const createJob = require('./job-gfs')
+import createJob from './job-gfs.js'
 
 // Produced every 6h
 const runInterval = 6 * 3600
@@ -16,7 +16,7 @@ const lowerLimit = 0
 const upperLimit = (process.env.UPPER_LIMIT ? Number(process.env.UPPER_LIMIT) : 240 * 3600)
 
 // Setup job name, model name, bounds and generation parameters
-module.exports = createJob({
+export default createJob({
   id: 'weacast-gfs-world',
   model: 'gfs-world',
   bounds: [0, -90, 360, 90],

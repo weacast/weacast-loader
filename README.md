@@ -3,8 +3,7 @@
 [![Build Status](https://travis-ci.com/weacast/weacast-loader.png?branch=master)](https://travis-ci.com/weacast/weacast-loader)
 [![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
 [![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
-[![Dependency Status](https://img.shields.io/david/weacast/weacast-loader.svg?style=flat-square)](https://david-dm.org/weacast/weacast-loader)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast-docs/)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast/)
 
 [Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System) produced by the National Centers for Environmental Prediction (NCEP).
 
@@ -28,7 +27,7 @@ docker-compose down -v
 
 ## Documentation
 
-The [Weacast docs](https://weacast.github.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
+The [Weacast docs](https://weacast.github.io/weacast/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
 
 ## Debug
 

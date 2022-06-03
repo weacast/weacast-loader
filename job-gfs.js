@@ -1,5 +1,8 @@
-const path = require('path')
-const util = require('util')
+import path from 'path'
+import util from 'util'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const outputPath = path.join(__dirname, 'forecast-data')
 
 const defaults = (options) => ({
@@ -11,33 +14,33 @@ const defaults = (options) => ({
   elements: [{
     element: 'u-wind',
     name: 'var_UGRD',
-    levels: [ 'lev_10_m_above_ground' ]
+    levels: ['lev_10_m_above_ground']
   }, {
     element: 'gust',
     name: 'var_GUST',
-    levels: [ 'lev_surface' ]
+    levels: ['lev_surface']
   }, {
     element: 'v-wind',
     name: 'var_VGRD',
-    levels: [ 'lev_10_m_above_ground' ]
+    levels: ['lev_10_m_above_ground']
   }, {
     element: 'precipitations',
     name: 'var_APCP',
-    levels: [ 'lev_surface' ],
+    levels: ['lev_surface'],
     lowerLimit: 3 * 3600 // Accumulation from T to T-3H
   }, {
     element: 'temperature',
     name: 'var_TMP',
-    levels: [ 'lev_2_m_above_ground' ]
+    levels: ['lev_2_m_above_ground']
   }],
-  filepath: `<%= element %>/<%= level.split('_')[1] %>/<%= runTime.format('HH') %>/<%= timeOffset / 3600 %>`,
-  collection: `<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level.split('_')[1] %><% } else { %><%= model %>-<%= element %><% } %>`,
+  filepath: '<%= element %>/<%= level.split(\'_\')[1] %>/<%= runTime.format(\'HH\') %>/<%= timeOffset / 3600 %>',
+  collection: '<% if (levels.length > 1) { %><%= model %>-<%= element %>-<%= level.split(\'_\')[1] %><% } else { %><%= model %>-<%= element %><% } %>',
   archiveId: (options.isobaric ? `archive/${options.model}-isobaric` : `archive/${options.model}`) +
-    `/<%= runTime.format('YYYY/MM/DD/HH') %>/<%= element %>/<%= level.split('_')[1] %>/<%= forecastTime.format('YYYY-MM-DD-HH') %>`,
+    '/<%= runTime.format(\'YYYY/MM/DD/HH\') %>/<%= element %>/<%= level.split(\'_\')[1] %>/<%= forecastTime.format(\'YYYY-MM-DD-HH\') %>',
   cog: true
 })
 
-module.exports = (options) => {
+export default (options) => {
   options = Object.assign({}, defaults(options), options)
   const filepath = options.filepath
   const id = `${options.model}/${filepath}`
@@ -57,7 +60,7 @@ module.exports = (options) => {
     ]
   }
   // Check if we archive on S3
-  let stores = [{
+  const stores = [{
     id: 'fs',
     options: {
       path: outputPath
@@ -152,7 +155,8 @@ module.exports = (options) => {
             match: { predicate: () => !options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>', store: 'fs' },
-            output: { key: `${archiveId}.grib`,
+            output: {
+              key: `${archiveId}.grib`,
               store: 's3',
               params: { ACL: 'public-read' }
             }
@@ -161,13 +165,14 @@ module.exports = (options) => {
             match: { predicate: () => options.cog && process.env.S3_BUCKET },
             hook: 'copyToStore',
             input: { key: '<%= id %>.tif', store: 'fs' },
-            output: { key: `${archiveId}.cog`,
+            output: {
+              key: `${archiveId}.cog`,
               store: 's3',
               params: { ACL: 'public-read' }
             }
           },
           runCommand: {
-            command: `weacast-grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
+            command: `grib2json ${outputPath}/<%= id %> -d -p <%= (element.precision || 2) %> -o ${outputPath}/<%= id %>.json`
           },
           // This will add grid data in a data field
           readJson: {
@@ -178,7 +183,8 @@ module.exports = (options) => {
           // For forecast hours evenly divisible by 6, the accumulation period is from T-6h to T,
           // while for other forecast hours (divisible by 3 but not 6) it is from T-3h to T.
           // We unify everything to 3H accumulation period.
-          normalizePrecipitations: { hook: 'apply',
+          normalizePrecipitations: {
+            hook: 'apply',
             match: { element: 'precipitations', predicate: (item) => item.forecastTime.hours() % 6 === 0 },
             function: (item) => {
               for (let i = 0; i < item.data.length; i++) {
@@ -187,7 +193,8 @@ module.exports = (options) => {
             }
           },
           // Convert temperature from K to C°
-          convertTemperature: { hook: 'apply',
+          convertTemperature: {
+            hook: 'apply',
             match: { element: 'temperature' },
             function: (item) => {
               for (let i = 0; i < item.data.length; i++) {
@@ -203,11 +210,13 @@ module.exports = (options) => {
             collection,
             filter: { forecastTime: '<%= forecastTime.format() %>' }
           },
-          writeRawData: { hook: 'writeMongoCollection',
+          writeRawData: {
+            hook: 'writeMongoCollection',
             dataPath: 'result',
             collection,
-            transform: { omit: ['id', 'model', 'levels', 'element', 'client'] } },
-          emitEvent: { name: collection, pick: [ 'runTime', 'forecastTime' ] },
+            transform: { omit: ['id', 'model', 'levels', 'element', 'client'] }
+          },
+          emitEvent: { name: collection, pick: ['runTime', 'forecastTime'] },
           tileGrid: {
             match: { predicate: (item) => options.tileResolution },
             dataPath: 'result.data',
@@ -215,7 +224,8 @@ module.exports = (options) => {
             output: { resolution: options.tileResolution },
             transform: { merge: { forecastTime: '<%= forecastTime.format() %>', runTime: '<%= runTime.format() %>', timeseries: false } }
           },
-          writeTiles: { hook: 'writeMongoCollection',
+          writeTiles: {
+            hook: 'writeMongoCollection',
             dataPath: 'result.data',
             collection,
             match: { predicate: (item) => options.tileResolution },

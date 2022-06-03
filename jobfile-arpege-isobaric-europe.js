@@ -1,4 +1,4 @@
-const createJob = require('./job-arpege')
+import createJob from './job-arpege.js'
 
 // Produced every 6h
 const runInterval = 6 * 3600
@@ -16,7 +16,7 @@ const lowerLimit = 0
 const upperLimit = (process.env.UPPER_LIMIT ? Number(process.env.UPPER_LIMIT) : 102 * 3600)
 
 // Setup job name, model name, bounds and generation parameters
-module.exports = createJob({
+export default createJob({
   id: 'weacast-arpege-isobaric-europe',
   model: 'arpege-europe',
   request: {
@@ -39,15 +39,15 @@ module.exports = createJob({
   elements: [{
     element: 'u-wind',
     name: 'U_COMPONENT_OF_WIND__ISOBARIC_SURFACE',
-    levels: [ 1000, 700, 450, 300, 200 ]
+    levels: [1000, 700, 450, 300, 200]
   }, {
     element: 'v-wind',
     name: 'V_COMPONENT_OF_WIND__ISOBARIC_SURFACE',
-    levels: [ 1000, 700, 450, 300, 200 ]
+    levels: [1000, 700, 450, 300, 200]
   }, {
     element: 'temperature',
     name: 'TEMPERATURE__ISOBARIC_SURFACE',
-    levels: [ 1000, 700, 450, 300, 200 ]
+    levels: [1000, 700, 450, 300, 200]
   }],
   isobaric: true
 })

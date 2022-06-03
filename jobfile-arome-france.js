@@ -1,4 +1,4 @@
-const createJob = require('./job-arome')
+import createJob from './job-arome.js'
 
 // Produced every 3h
 const runInterval = 3 * 3600
@@ -16,7 +16,7 @@ const lowerLimit = 0
 const upperLimit = (process.env.UPPER_LIMIT ? Number(process.env.UPPER_LIMIT) : 42 * 3600)
 
 // Setup job name, model name, bounds and generation parameters
-module.exports = createJob({
+export default createJob({
   id: 'weacast-arome-france',
   model: 'arome-france',
   request: {

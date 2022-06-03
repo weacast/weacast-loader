@@ -3,6 +3,7 @@
   "description": "Weather forecast model data dowloader for Weacast",
   "version": "1.7.0",
   "homepage": "https://github.com/weacast/weacast-loader",
+  "type": "module",
   "keywords": [
     "weacast",
     "weacast-plugin"
@@ -30,8 +31,8 @@
     "release:major": "npm version major && npm publish",
     "changelog": "github_changelog_generator -u weacast -p weacast-loader && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
     "lint": "standard *.js test/**/*.js --fix",
-    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --exit --require babel-core/register",
-    "coverage": "nyc npm run mocha",
+    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --exit",
+    "coverage": "c8 npm run mocha",
     "test": "npm run lint && npm run coverage"
   },
   "standard": {
@@ -42,26 +43,20 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-export-extensions": "^6.22.0",
-    "babel-plugin-transform-runtime": "^6.0.0",
-    "babel-preset-env": "^1.7.0",
+    "c8": "^7.11.2",
     "chai": "^4.2.0",
     "chai-lint": "^0.1.1",
     "cross-env": "^4.0.0",
-    "nyc": "^15.0.1",
-    "mocha": "^6.2.0",
+    "mocha": "^9.0.0",
     "nock": "^9.3.2",
-    "shx": "^0.2.2",
-    "standard": "^10.0.2",
+    "shx": "^0.3.2",
+    "standard": "^17.0.0",
     "fs-extra": "^4.0.2",
     "mongodb": "^3.6.2"
   },
   "peerDependencies": {
     "@kalisio/krawler": "1.2.0",
-    "weacast-grib2json": "^1.0.1",
-    "weacast-gtiff2json": "^1.1.2"
+    "@weacast/grib2json": "^2.0.2",
+    "@weacast/gtiff2json": "^2.0.2"
   }
 }

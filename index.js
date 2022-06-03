@@ -1,8 +1,8 @@
-const createArpegeJob = require('./job-arpege')
-const createAromeJob = require('./job-arome')
-const createGfsJob = require('./job-gfs')
+import createArpegeJob from './job-arpege.js'
+import createAromeJob from './job-arome.js'
+import createGfsJob from './job-gfs.js'
 
-module.exports = {
+export default {
   createArpegeJob,
   createAromeJob,
   createGfsJob

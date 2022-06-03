@@ -7,4 +7,4 @@ ENV CRON="0 50 * * * *"
 
 COPY jobfile-gfs-isobaric-world.js .
 
-CMD node /opt/krawler --cron "$CRON" jobfile-gfs-isobaric-world.js
+CMD krawler --cron "$CRON" jobfile-gfs-isobaric-world.js

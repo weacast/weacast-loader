@@ -1,23 +1,29 @@
 ARG KRAWLER_TAG=latest
-ARG GTIFF2JSON_TAG=1.1.2
+ARG GTIFF2JSON_TAG=2.0.2
 
 # Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 
 # Make the job image using the krawler image alias
-FROM node:12-buster-slim
+FROM node:16-buster-slim
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
 # Copy Krawler
 COPY --from=krawler /opt/krawler /opt/krawler
+WORKDIR /opt/krawler
+RUN yarn link && yarn link @kalisio/krawler
+
+# Required as yarn does not seem to set it correctly
+RUN chmod u+x /usr/local/bin/krawler
+
 ENV NODE_PATH=/opt/krawler/node_modules
 
 # Install GDAL
 RUN apt-get update && apt-get -y install gdal-bin git && apt-get clean
 
-# Install weacast-gtiff2json
-RUN yarn global add weacast-gtiff2json@${GTIFF2JSON_TAG}
+# Install @weacast/gtiff2json
+RUN yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG}
 
 # Install the job
 COPY job-arpege.js .
