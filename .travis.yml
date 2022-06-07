@@ -38,7 +38,7 @@ jobs:
     - chmod +x ./cc-test-reporter
     - "./cc-test-reporter before-build"
     - "$JAVA_HOME/bin/java -version"
-    - git clone -b es-modules https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
+    - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
     - yarn link @kalisio/krawler
     - yarn global add @weacast/gtiff2json@2.0.2
     - yarn global add @weacast/grib2json@2.0.2
