@@ -7,4 +7,4 @@ ENV CRON="0 5 * * * *"
 
 COPY jobfile-arome-france-high.js .
 
-CMD krawler --cron "$CRON" jobfile-arome-france-high.js
+CMD krawler --cron "$CRON" --success-rate 0.75 jobfile-arome-france-high.js

@@ -7,4 +7,4 @@ ENV CRON="0 40 * * * *"
 
 COPY jobfile-arpege-isobaric-world.js .
 
-CMD krawler --cron "$CRON" jobfile-arpege-isobaric-world.js
+CMD krawler --cron "$CRON" --success-rate 0.75 jobfile-arpege-isobaric-world.js
