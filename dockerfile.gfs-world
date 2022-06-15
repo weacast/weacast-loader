@@ -7,4 +7,4 @@ ENV CRON="0 20 * * * *"
 
 COPY jobfile-gfs-world.js .
 
-CMD krawler --cron "$CRON" --success-rate 0.75 jobfile-gfs-world.js
+CMD krawler --cron "$CRON" jobfile-gfs-world.js
