@@ -1,5 +1,5 @@
 ARG KRAWLER_TAG=latest
-ARG GRIB2JSON_TAG=2.1.1
+ARG GRIB2JSON_TAG=2.1.0
 
 # Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler

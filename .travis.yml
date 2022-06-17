@@ -41,6 +41,6 @@ jobs:
     - git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
     - yarn link @kalisio/krawler
     - yarn global add @weacast/gtiff2json@2.1.1
-    - yarn global add @weacast/grib2json@2.1.1
+    - yarn global add @weacast/grib2json@2.1.0
     after_script:
     - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
