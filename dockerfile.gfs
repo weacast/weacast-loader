@@ -19,7 +19,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 RUN $JAVA_HOME/bin/java -version
 
 # Install @weacast/grib2json
-RUN yarn global add @weacast/grib2json@${GRIB2JSON_TAG} --unsafe
+RUN yarn global add @weacast/grib2json@${GRIB2JSON_TAG}
 
 # Install GDAL
 RUN apt-get update && apt-get -y install gdal-bin
@@ -31,8 +31,6 @@ RUN yarn link && yarn link @kalisio/krawler
 
 # Required as yarn does not seem to set it correctly
 RUN chmod u+x /usr/local/bin/krawler
-
-ENV NODE_PATH=/opt/krawler/node_modules
 
 # Install the job
 COPY job-gfs.js .

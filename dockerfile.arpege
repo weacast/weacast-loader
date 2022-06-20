@@ -17,8 +17,6 @@ RUN yarn link && yarn link @kalisio/krawler
 # Required as yarn does not seem to set it correctly
 RUN chmod u+x /usr/local/bin/krawler
 
-ENV NODE_PATH=/opt/krawler/node_modules
-
 # Install GDAL
 RUN apt-get update && apt-get -y install gdal-bin git && apt-get clean
 
