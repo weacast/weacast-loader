@@ -3,27 +3,27 @@ ARG GTIFF2JSON_TAG=2.1.3
 
 # Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
 FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
-
-# Make the job image using the krawler image alias
-FROM node:16-buster-slim
-
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
-# Copy Krawler
-COPY --from=krawler /opt/krawler /opt/krawler
-WORKDIR /opt/krawler
-RUN yarn link && yarn link @kalisio/krawler
-
-# Required as yarn does not seem to set it correctly
-RUN chmod u+x /usr/local/bin/krawler
+USER root
 
 # Install GDAL
-RUN apt-get update && apt-get -y install gdal-bin git && apt-get clean
+RUN mkdir -p /usr/share/man/man1 && \
+  DEBIAN_FRONTEND=noninteractive && \
+  apt-get update && \
+  apt-get --no-install-recommends --yes install \
+    gdal-bin proj-bin ca-certificates \
+    git && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+USER node
+WORKDIR /opt/krawler
 
 # Install @weacast/gtiff2json
-RUN yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG}
+RUN yarn add @weacast/gtiff2json@${GTIFF2JSON_TAG} && yarn cache clean
 
 # Install the job
-COPY job-arpege.js .
+COPY --chown=node:node job-arpege.js .
 
 HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node /opt/krawler/healthcheck.js --success-rate 0.75
