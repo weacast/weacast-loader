@@ -12,7 +12,7 @@ RUN mkdir -p /usr/share/man/man1 && \
   DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
   apt-get --no-install-recommends --yes install \
-    gdal-bin proj-bin ca-certificates \
+    gdal-bin \
     git && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
