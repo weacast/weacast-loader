@@ -9,13 +9,14 @@ USER root
 
 # Install Java
 # See http://debian.2.n7.nabble.com/Bug-863199-error-creating-symbolic-link-usr-share-man-man1-rmid-1-gz-dpkg-tmp-td4120571.html#a4283276
-RUN mkdir -p /usr/share/man/man1 && \
+# RUN mkdir -p /usr/share/man/man1 && \
+RUN \
   DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
   apt-get --no-install-recommends --yes install \
     openjdk-11-jre-headless \
-    gdal-bin \
-    git && \
+    ca-certificates \
+    gdal-bin && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 

@@ -8,17 +8,23 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 USER root
 
 # Install GDAL
-RUN mkdir -p /usr/share/man/man1 && \
+# git is only required to install one of gtiff2json's dependency, we remove it afterwards
+RUN \
   DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
   apt-get --no-install-recommends --yes install \
     gdal-bin \
+    ca-certificates \
     git && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
 # Install @weacast/gtiff2json
-RUN yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG} && yarn cache clean
+RUN \
+  yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG} && \
+  yarn cache clean && \
+  apt-get --purge --yes remove git && \
+  apt-get --purge --yes autoremove
 
 USER node
 WORKDIR /opt/krawler
