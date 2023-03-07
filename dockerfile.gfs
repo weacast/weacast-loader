@@ -21,7 +21,10 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # Install @weacast/grib2json
-RUN yarn global add @weacast/grib2json@${GRIB2JSON_TAG} && yarn cache clean
+RUN \
+  yarn global add @weacast/grib2json@${GRIB2JSON_TAG} && \
+  chmod a+x /usr/local/share/.config/yarn/global/node_modules/@weacast/grib2json/bin/grib2json && \
+  yarn cache clean
 
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 RUN $JAVA_HOME/bin/java -version
