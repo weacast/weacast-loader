@@ -17,11 +17,11 @@ RUN mkdir -p /usr/share/man/man1 && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
+# Install @weacast/gtiff2json
+RUN yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG} && yarn cache clean
+
 USER node
 WORKDIR /opt/krawler
-
-# Install @weacast/gtiff2json
-RUN yarn add @weacast/gtiff2json@${GTIFF2JSON_TAG} && yarn cache clean
 
 # Install the job
 COPY --chown=node:node job-arpege.js .
