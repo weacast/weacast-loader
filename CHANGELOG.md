@@ -1,3 +1,5 @@
+Please refer to GitHub issues for changelog starting from v1.8: https://github.com/weacast/weacast-loader/issues.
+
 # Changelog
 
 ## [v1.7.0](https://github.com/weacast/weacast-loader/tree/v1.7.0) (2022-02-02)
