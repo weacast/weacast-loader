@@ -25,10 +25,10 @@
     "node": ">= 16.0.0"
   },
   "scripts": {
-    "postversion": "git push origin HEAD --tags",
-    "release:patch": "npm version patch",
-    "release:minor": "npm version minor",
-    "release:major": "npm version major",
+    "publish": "git push origin --tags && git push origin",
+    "release:patch": "npm version --force patch",
+    "release:minor": "npm version --force minor",
+    "release:major": "npm version --force major",
     "lint": "standard *.js test/**/*.js --fix",
     "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --exit",
     "coverage": "c8 npm run mocha",
@@ -55,7 +55,7 @@
   },
   "peerDependencies": {
     "@kalisio/krawler": "2.5.0",
-    "@weacast/grib2json": "^2.1.3",
-    "@weacast/gtiff2json": "^2.1.3"
+    "@weacast/grib2json": "^2.1.5",
+    "@weacast/gtiff2json": "^2.1.5"
   }
 }
