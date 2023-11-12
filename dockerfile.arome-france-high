@@ -3,6 +3,8 @@ FROM  weacast/weacast-arome:${TAG}
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
+ENV CRON="0 5 * * * *"
+
 COPY jobfile-arome-france-high.js .
 
-CMD node /opt/krawler --cron "0 05,35 * * * *" jobfile-arome-france-high.js
+CMD krawler --cron "$CRON" jobfile-arome-france-high.js

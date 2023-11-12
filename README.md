@@ -1,10 +1,9 @@
 # weacast-loader
 
-[![Build Status](https://travis-ci.org/weacast/weacast-loader.png?branch=master)](https://travis-ci.org/weacast/weacast-loader)
+[![Build Status](https://app.travis-ci.com/weacast/weacast-loader.svg?branch=master)](https://app.travis-ci.com/weacast/weacast-loader)
 [![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
 [![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
-[![Dependency Status](https://img.shields.io/david/weacast/weacast-loader.svg?style=flat-square)](https://david-dm.org/weacast/weacast-loader)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast-docs/)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast/)
 
 [Krawler](https://kalisio.github.io/krawler/) based services to download data from the global numerical weather prediction model ARPEGE (Action de Recherche Petite Echelle Grande Echelle) and the small scale numerical prediction model AROME operational at Météo-France and the global numerical weather prediction model GFS (Global Forecast System) produced by the National Centers for Environmental Prediction (NCEP).
 
@@ -28,7 +27,37 @@ docker-compose down -v
 
 ## Documentation
 
-The [Weacast docs](https://weacast.github.io/weacast-docs/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
+The [Weacast docs](https://weacast.github.io/weacast/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Weacast.
+
+## Debug
+
+Here are some request examples if you'd like to test the underlying services manually.
+
+### GFS
+
+The [Grib Filter](https://nomads.ncep.noaa.gov/txt_descriptions/grib_filter_doc.shtml) ease the generation of request URLs for GFS. For instance using the [grib filter for GFS 0.5°](https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl) you get this kind of URL:
+
+* https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?file=gfs.t00z.pgrb2full.0p50.f000&lev_surface=on&var_APCP=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs.20211125%2F00%2Fatmos
+
+### Météo France
+
+> Take care that you need to URL encode your token or remove the trailing `=` caracters
+
+WCS `GetCapabilities` operation:
+
+* https://public-api.meteofrance.fr/public/arpege/1.0/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCapabilities?REQUEST=GetCapabilities&service=WCS&version=2.0.1&apikey=token
+
+Select a coverage, e.g. `TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND___2021-11-24T12.00.00Z`.
+
+WCS `DescribeCoverage` operation:
+
+* https://public-api.meteofrance.fr/public/arpege/1.0/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/DescribeCoverage?REQUEST=DescribeCoverage&service=WCS&version=2.0.1&coverageid=TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND___2021-11-24T12.00.00Z&apikey=token
+
+WCS `GetCoverage` operation:
+
+* https://public-api.meteofrance.fr/public/arpege/1.0/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage?REQUEST=GetCoverage&service=WCS&version=2.0.1&coverageid=TEMPERATURE__SPECIFIC_HEIGHT_LEVEL_ABOVE_GROUND___2021-11-24T12.00.00Z&subset=time(2021-11-24T12:00:00Z)&subset=height(2)&apikey=token
+
+> Web services previously supported HTTP GET with key/value pair (KVP) encoding but now use different endpoints for the different operations so that the `REQUEST` parameter might not be required anymore. 
 
 ## License
 

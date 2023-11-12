@@ -3,6 +3,8 @@ FROM  weacast/weacast-arpege:${TAG}
 
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
+ENV CRON="0 45 * * * *"
+
 COPY jobfile-arpege-isobaric-europe.js .
 
-CMD node /opt/krawler --cron "0 10,40 * * * *" jobfile-arpege-isobaric-europe.js
+CMD krawler --cron "$CRON" jobfile-arpege-isobaric-europe.js

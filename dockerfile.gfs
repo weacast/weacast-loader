@@ -1,15 +1,12 @@
 ARG KRAWLER_TAG=latest
-
-# Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
-FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
-
-# Make the job image using the krawler image alias
-FROM node:12-buster-slim
-
 ARG GRIB2JSON_TAG=ecCodes
 ARG ECCODES_VERSION=2.19.1
 
+# Make a Krawler image alias to be able to take into account the KRAWLER_TAG argument
+FROM kalisio/krawler:${KRAWLER_TAG} AS krawler
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
+
+USER root
 
 # Install ecCodes tools
 RUN apt-get update -y
@@ -21,24 +18,22 @@ RUN cd /tmp && wget --output-document=${ECCODES}.tar.gz ${DOWNLOAD_URL}/${ECCODE
 RUN tar -zxvf ${ECCODES}.tar.gz
 RUN cd ${ECCODES} && mkdir build && cd build && cmake -DENABLE_FORTRAN=OFF -DENABLE_PNG=ON .. && make -j2 && make install
 
-# Install GDAL
-RUN apt-get -y install gdal-bin
+# Install GDAL/Git
+RUN apt-get -y install gdal-bin git
 
-# Install Git
-RUN apt-get -y install git
+# Install @weacast/grib2json
+RUN \
+  yarn global add @weacast/grib2json@${GRIB2JSON_TAG} && \
+  chmod a+x /usr/local/share/.config/yarn/global/node_modules/@weacast/grib2json/bin/grib2json && \
+  yarn cache clean
 
-# Install weacast-grib2json
-RUN git clone https://github.com/weacast/weacast-grib2json.git -b ${GRIB2JSON_TAG} --single-branch --depth 1
-RUN cd weacast-grib2json && npm install && npm link
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+RUN $JAVA_HOME/bin/java -version
 
-# Restore original working directory
+USER node
 WORKDIR /opt/krawler
 
-# Copy Krawler
-COPY --from=krawler /opt/krawler /opt/krawler
-ENV NODE_PATH=/opt/krawler/node_modules
-
 # Install the job
-COPY job-gfs.js .
+COPY --chown=node:node job-gfs.js .
 
 HEALTHCHECK --interval=1m --timeout=10s --start-period=1m CMD node /opt/krawler/healthcheck.js --success-rate 0.75

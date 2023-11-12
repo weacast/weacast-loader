@@ -1,4 +1,85 @@
+Please refer to GitHub issues for changelog starting from v1.8: https://github.com/weacast/weacast-loader/issues.
+
 # Changelog
+
+## [v1.7.0](https://github.com/weacast/weacast-loader/tree/v1.7.0) (2022-02-02)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.3...v1.7.0)
+
+**Implemented enhancements:**
+
+- Use HTTPS endpoint for GFS grib filter service [\#52](https://github.com/weacast/weacast-loader/issues/52)
+- Make the TTL option configurable from environment [\#51](https://github.com/weacast/weacast-loader/issues/51)
+- Make the keep past runs option configurable from environment [\#49](https://github.com/weacast/weacast-loader/issues/49)
+
+**Fixed bugs:**
+
+- Make the keep past runs option work correctly [\#50](https://github.com/weacast/weacast-loader/issues/50)
+
+## [v1.6.3](https://github.com/weacast/weacast-loader/tree/v1.6.3) (2021-11-25)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.2...v1.6.3)
+
+**Fixed bugs:**
+
+- Rate limiting strategy does not apply on errors [\#48](https://github.com/weacast/weacast-loader/issues/48)
+
+## [v1.6.2](https://github.com/weacast/weacast-loader/tree/v1.6.2) (2021-11-22)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.1...v1.6.2)
+
+**Implemented enhancements:**
+
+- Update CRON and make it configurable [\#47](https://github.com/weacast/weacast-loader/issues/47)
+
+## [v1.6.1](https://github.com/weacast/weacast-loader/tree/v1.6.1) (2021-11-09)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.6.0...v1.6.1)
+
+**Implemented enhancements:**
+
+- Implement a strategy to avoid rate limiting [\#46](https://github.com/weacast/weacast-loader/issues/46)
+
+## [v1.6.0](https://github.com/weacast/weacast-loader/tree/v1.6.0) (2021-10-18)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.5.1...v1.6.0)
+
+**Implemented enhancements:**
+
+- Upgrade to use the new Météo France API [\#45](https://github.com/weacast/weacast-loader/issues/45)
+
+**Merged pull requests:**
+
+- Bump tar from 4.4.15 to 4.4.19 [\#44](https://github.com/weacast/weacast-loader/pull/44) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump path-parse from 1.0.6 to 1.0.7 [\#43](https://github.com/weacast/weacast-loader/pull/43) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump minimist from 1.2.0 to 1.2.5 [\#42](https://github.com/weacast/weacast-loader/pull/42) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump tar from 4.4.6 to 4.4.15 [\#41](https://github.com/weacast/weacast-loader/pull/41) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.20 to 4.17.21 [\#40](https://github.com/weacast/weacast-loader/pull/40) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump y18n from 4.0.0 to 4.0.1 [\#39](https://github.com/weacast/weacast-loader/pull/39) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v1.5.1](https://github.com/weacast/weacast-loader/tree/v1.5.1) (2021-03-22)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.5.0...v1.5.1)
+
+## [v1.5.0](https://github.com/weacast/weacast-loader/tree/v1.5.0) (2021-03-22)
+
+[Full Changelog](https://github.com/weacast/weacast-loader/compare/v1.4.2...v1.5.0)
+
+**Implemented enhancements:**
+
+- Support GFS v16 [\#38](https://github.com/weacast/weacast-loader/issues/38)
+- Allow to keep data for past runs [\#37](https://github.com/weacast/weacast-loader/issues/37)
+- Add a docker image dedicated to AROME [\#33](https://github.com/weacast/weacast-loader/issues/33)
+- Update loaders to manage multiple elevation levels [\#32](https://github.com/weacast/weacast-loader/issues/32)
+
+**Fixed bugs:**
+
+- Upper limit exceeded for elements with a oldest run interval [\#34](https://github.com/weacast/weacast-loader/issues/34)
+
+**Merged pull requests:**
+
+- Bump ini from 1.3.5 to 1.3.7 [\#35](https://github.com/weacast/weacast-loader/pull/35) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump lodash from 4.17.10 to 4.17.20 [\#31](https://github.com/weacast/weacast-loader/pull/31) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v1.4.2](https://github.com/weacast/weacast-loader/tree/v1.4.2) (2020-10-09)
 
@@ -79,13 +160,13 @@
 - Add high resolution AROME model from Meteo France [\#6](https://github.com/weacast/weacast-loader/issues/6)
 - Make output precision configurable [\#5](https://github.com/weacast/weacast-loader/issues/5)
 - Provide the abilitiy to specify a version in the dockerfiles [\#4](https://github.com/weacast/weacast-loader/issues/4)
+- Allow to configure sync DB through environment variable [\#3](https://github.com/weacast/weacast-loader/issues/3)
 - Retrieve data from previous run if current run is not yet available [\#2](https://github.com/weacast/weacast-loader/issues/2)
 
 **Fixed bugs:**
 
-- Allow to configure sync DB through environment variable [\#3](https://github.com/weacast/weacast-loader/issues/3)
 - Clean data of previous run [\#1](https://github.com/weacast/weacast-loader/issues/1)
 
 
 
-\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
