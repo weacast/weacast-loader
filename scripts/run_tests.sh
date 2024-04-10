@@ -43,6 +43,8 @@ done
 . "$WORKSPACE_DIR/development/workspaces/jobs/jobs.sh" weacast-loaders
 
 # Required by tests
+GTIFF2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/gtiff2json']")
+GRIB2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/grib2json']")
 git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
 yarn link @kalisio/krawler
 yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG}

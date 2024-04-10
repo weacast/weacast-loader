@@ -50,9 +50,13 @@ jobs:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: bash ./scripts/run_tests.sh -n ${{ matrix.node }} -m ${{ matrix.mongo }}
 
-  build:
-    name: Build jobs
-    if: ${{ !contains(github.event.head_commit.message, 'skip app') }}
+  build_models:
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ 'gfs', 'arpege', 'arome' ]
+    name: Build models
+    if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
@@ -65,7 +69,39 @@ jobs:
         env:
           GITHUB_DEVELOPMENT_PAT: ${{ secrets.GH_DEVELOPMENT_PAT }}
         run: bash ./scripts/setup_workspace.sh
-      - name: Build jobs
+      - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -p -r ${{ github.job }}
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r ${{ github.job }}
+
+  build_loaders:
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ 'gfs', 'arpege', 'arome' ]
+        loader: [ 'world', 'isobaric-world', 'europe', 'isobaric-europe', 'france', 'france-high' ]
+        exclude:
+          - model: 'gfs'
+            loader: [ 'world', 'isobaric-world' ]
+          - model: 'arpege'
+            loader: [ 'france', 'france-high' ]
+          - model: 'arome'
+            loader: [ 'world', 'isobaric-world', 'europe', 'isobaric-europe' ]
+    name: Build loaders
+    if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Init runner
+        run: bash ./scripts/init_runner.sh ${{ github.job }}
+      - name: Setup workspace
+        env:
+          GITHUB_DEVELOPMENT_PAT: ${{ secrets.GH_DEVELOPMENT_PAT }}
+        run: bash ./scripts/setup_workspace.sh
+      - name: Build image
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r ${{ github.job }}

@@ -16,9 +16,6 @@ WORKSPACE_TAG=
 
 begin_group "Setting up workspace ..."
 
-GTIFF2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/gtiff2json']")
-GRIB2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/grib2json']")
-
 if [ "$CI" = true ]; then
     WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
     DEVELOPMENT_REPO_URL="https://$GITHUB_DEVELOPMENT_PAT@github.com/kalisio/development.git"

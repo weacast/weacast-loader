@@ -13,7 +13,8 @@ ROOT_DIR=$(dirname "$THIS_DIR")
 
 PUBLISH=false
 CI_STEP_NAME="Build"
-while getopts "prml:" option; do
+LOADER=
+while getopts "pr:m:l:" option; do
     case $option in
         p) # publish
             PUBLISH=true
@@ -22,7 +23,7 @@ while getopts "prml:" option; do
             CI_STEP_NAME=$OPTARG
             trap 'slack_ci_report "$ROOT_DIR" "$CI_STEP_NAME" "$?" "$SLACK_WEBHOOK_JOBS"' EXIT
             ;;
-        m) # weacast model image to be build: gfs, arpege
+        m) # weacast model image to be build or used (if loader build): gfs, arpege, ...
             MODEL=$OPTARG
             ;;
         l) # weacast loader image to be build: europe, isobaric-europe, ...
@@ -39,15 +40,9 @@ done
 WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
 init_job_infos "$ROOT_DIR"
 
-JOB=$(get_job_name)
-KRAWLER_VERSION=$(get_job_krawler_version)
 GIT_TAG=$(get_job_tag)
-
-if [[ -z "$GIT_TAG" ]]; then
-    echo "About to build ${JOB}:${LOADER} development version based on krawler development version..."
-else
-    echo "About to build ${JOB}:${LOADER} v${VERSION} based on krawler ${KRAWLER_VERSION}..."
-fi
+GTIFF2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/gtiff2json']")
+GRIB2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/grib2json']")
 
 load_env_files "$WORKSPACE_DIR/development/common/kalisio_dockerhub.enc.env" "$WORKSPACE_DIR/development/common/SLACK_WEBHOOK_JOBS.enc.env"
 load_value_files "$WORKSPACE_DIR/development/common/KALISIO_DOCKERHUB_PASSWORD.enc.value"
@@ -56,20 +51,31 @@ load_value_files "$WORKSPACE_DIR/development/common/KALISIO_DOCKERHUB_PASSWORD.e
 ##
 
 IMAGE_NAME="weacast/weacast-$MODEL"
-DOCKERFILE=dockerfile.$MODEL-$LOADER
 if [[ -z "$GIT_TAG" ]]; then
     VERSION=latest
+    KRAWLER_TAG=latest
 else
     VERSION=$(get_job_version)
+    KRAWLER_TAG=$(get_job_krawler_version)
 fi
-IMAGE_TAG=$LOADER-$VERSION
+if [[ -z "$LOADER" ]]; then
+    IMAGE_TAG=$VERSION
+    DOCKERFILE=dockerfile.$MODEL
+else
+    IMAGE_TAG=$LOADER-$VERSION
+    DOCKERFILE=dockerfile.$MODEL-$LOADER
+fi
+
+echo "About to build image ${IMAGE_NAME}:${IMAGE_TAG} based on kalisio/krawler:${KRAWLER_TAG}..."
 
 begin_group "Building container ..."
 
 docker login --username "$KALISIO_DOCKERHUB_USERNAME" --password-stdin < "$KALISIO_DOCKERHUB_PASSWORD"
 # DOCKER_BUILDKIT is here to be able to use Dockerfile specific dockerginore (app.Dockerfile.dockerignore)
 DOCKER_BUILDKIT=1 docker build -f "$ROOT_DIR/$DOCKERFILE" \
-    --build-arg TAG=$VERSION -t "$IMAGE_NAME:$IMAGE_TAG" \
+    --build-arg KRAWLER_TAG=$KRAWLER_TAG --build-arg TAG=$VERSION \
+    --build-arg GTIFF2JSON_TAG=$GTIFF2JSON_TAG --build-arg GRIB2JSON_TAG=$GRIB2JSON_TAG \
+    -t "$IMAGE_NAME:$IMAGE_TAG" \
     "$ROOT_DIR"
 
 if [ "$PUBLISH" = true ]; then
