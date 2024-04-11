@@ -82,11 +82,25 @@ jobs:
         loader: [ 'world', 'isobaric-world', 'europe', 'isobaric-europe', 'france', 'france-high' ]
         exclude:
           - model: 'gfs'
-            loader: [ 'world', 'isobaric-world' ]
+            loader: 'europe'
+          - model: 'gfs'
+            loader: 'isobaric-europe'
+          - model: 'gfs'
+            loader: 'france'
+          - model: 'gfs'
+            loader: 'france-high'
           - model: 'arpege'
-            loader: [ 'france', 'france-high' ]
+            loader: 'france'
+          - model: 'arpege'
+            loader: 'france-high'
           - model: 'arome'
-            loader: [ 'world', 'isobaric-world', 'europe', 'isobaric-europe' ]
+            loader: 'world'
+          - model: 'arome'
+            loader: 'isobaric-world'
+          - model: 'arome'
+            loader: 'europe'
+          - model: 'arome'
+            loader: 'isobaric-europe'
     name: Build loaders
     if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
     runs-on: ubuntu-22.04
@@ -104,4 +118,4 @@ jobs:
       - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r "${{ github.job }} ${{ matrix.model }} ${{ matrix.loader }}"
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r "${{ github.job }} ${{ matrix.model }}-${{ matrix.loader }}"
