@@ -75,6 +75,7 @@ jobs:
         run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r "${{ github.job }} ${{ matrix.model }}"
 
   build_loader:
+    needs: build_model
     strategy:
       fail-fast: false
       matrix:
