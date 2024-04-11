@@ -50,7 +50,7 @@ jobs:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: bash ./scripts/run_tests.sh -n ${{ matrix.node }} -m ${{ matrix.mongo }}
 
-  build_models:
+  build_model:
     strategy:
       fail-fast: false
       matrix:
@@ -72,9 +72,9 @@ jobs:
       - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r ${{ github.job }}
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r "${{ github.job }} ${{ matrix.model }}"
 
-  build_loaders:
+  build_loader:
     strategy:
       fail-fast: false
       matrix:
@@ -104,4 +104,4 @@ jobs:
       - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r ${{ github.job }}
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r "${{ github.job }} ${{ matrix.model }} ${{ matrix.loader }}"
