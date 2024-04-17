@@ -55,7 +55,7 @@
   },
   "peerDependencies": {
     "@kalisio/krawler": "2.5.0",
-    "@weacast/grib2json": "^2.1.5",
-    "@weacast/gtiff2json": "^2.1.5"
+    "@weacast/grib2json": "^2.1.7",
+    "@weacast/gtiff2json": "^2.1.7"
   }
 }
