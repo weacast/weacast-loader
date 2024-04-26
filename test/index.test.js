@@ -32,6 +32,7 @@ function updateJobOptions (job, element) {
   Object.assign(nwpOptions, {
     runIndex: -2, // previous run to ensure it is already available
     upperLimit: nwpOptions.lowerLimit + nwpOptions.interval,
+    keepPastRuns: false,
     elements: [element]
   })
   afterHooks = job.hooks.tasks.after
