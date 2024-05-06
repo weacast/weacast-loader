@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# set -x
+set -x
 
 THIS_FILE=$(readlink -f "${BASH_SOURCE[0]}")
 THIS_DIR=$(dirname "$THIS_FILE")
@@ -44,8 +44,8 @@ done
 
 # Required by tests
 use_node "$NODE_VER"
-GTIFF2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" "peerDependencies['@weacast/gtiff2json']")
-GRIB2JSON_TAG=$(get_json_value "ROOT_DIR/package.json" "peerDependencies['@weacast/grib2json']")
+GTIFF2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" 'peerDependencies["@weacast/gtiff2json"]')
+GRIB2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" 'peerDependencies["@weacast/grib2json"]')
 git clone https://github.com/kalisio/krawler.git && cd krawler && yarn install && yarn link && cd ..
 yarn link @kalisio/krawler
 yarn global add @weacast/gtiff2json@${GTIFF2JSON_TAG}
