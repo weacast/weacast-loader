@@ -18,7 +18,7 @@ begin_group "Setting up workspace ..."
 
 if [ "$CI" = true ]; then
     WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
-    DEVELOPMENT_REPO_URL="https://$GITHUB_DEVELOPMENT_PAT@github.com/kalisio/development.git"
+    DEVELOPMENT_REPO_URL="https://$GITHUB_DEVELOPMENT_TOKEN@github.com/kalisio/development.git"
 else
     while getopts "b:t" option; do
         case $option in
@@ -30,25 +30,15 @@ else
             ;;
         esac
     done
+
     shift $((OPTIND-1))
     WORKSPACE_DIR="$1"
-
-    # NOTE: cloning weacast could be avoided if we could parse app_version from tag/branch name instead
-    # In this case, the kli would clone weacast
-    GIT_OPS="--recurse-submodules"
-    if [ -n "$WORKSPACE_TAG" ] || [ -n "$WORKSPACE_BRANCH" ]; then
-        GIT_OPS="$GIT_OPS --branch ${WORKSPACE_TAG:-$WORKSPACE_BRANCH}"
-    fi
-    git clone --depth 1 $GIT_OPS "$GITHUB_URL/weacast/weacast-loader.git" "$WORKSPACE_DIR/weacast-loader"
-
     DEVELOPMENT_REPO_URL="$GITHUB_URL/kalisio/development.git"
 
-    # unset KALISIO_DEVELOPMENT_DIR because we want kli to clone everything in $WORKSPACE_DIR
-    unset KALISIO_DEVELOPMENT_DIR
+    # Clone project in the workspace
+    git_shallow_clone "$GITHUB_URL/weacast/weacast-loader.git" "$WORKSPACE_DIR/weacast-loader" "${WORKSPACE_TAG:-${WORKSPACE_BRANCH:-}}"
 fi
 
-# clone development in $WORKSPACE_DIR
-DEVELOPMENT_DIR="$WORKSPACE_DIR/development"
-git clone --depth 1 "$DEVELOPMENT_REPO_URL" "$DEVELOPMENT_DIR"
+setup_workspace "$WORKSPACE_DIR" "$DEVELOPMENT_REPO_URL"
 
 end_group "Setting up workspace ..."

@@ -1,6 +1,7 @@
 # weacast-loader
 
-[![Build Status](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml/badge.svg)](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml)
+[![Latest Release](https://img.shields.io/github/v/tag/weacast/weacast-loader?sort=semver&label=latest)](https://github.com/weacast/weacast-loader/releases)
+[![CI](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml/badge.svg)](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml)
 [![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
 [![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
 [![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast/)

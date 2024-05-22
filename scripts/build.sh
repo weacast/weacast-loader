@@ -5,6 +5,7 @@ set -euo pipefail
 THIS_FILE=$(readlink -f "${BASH_SOURCE[0]}")
 THIS_DIR=$(dirname "$THIS_FILE")
 ROOT_DIR=$(dirname "$THIS_DIR")
+WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
 
 . "$THIS_DIR/kash/kash.sh"
 
@@ -21,6 +22,7 @@ while getopts "pr:m:l:" option; do
             ;;
         r) # report outcome to slack
             CI_STEP_NAME=$OPTARG
+            load_env_files "$WORKSPACE_DIR/development/common/SLACK_WEBHOOK_JOBS.enc.env"
             trap 'slack_ci_report "$ROOT_DIR" "$CI_STEP_NAME" "$?" "$SLACK_WEBHOOK_JOBS"' EXIT
             ;;
         m) # weacast model image to be build or used (if loader build): gfs, arpege, ...
@@ -37,20 +39,19 @@ done
 ## Init workspace
 ##
 
-WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
 init_job_infos "$ROOT_DIR"
 
 GIT_TAG=$(get_job_tag)
-GTIFF2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/gtiff2json']")
-GRIB2JSON_TAG=$(node -p -e "require('./package.json').peerDependencies['@weacast/grib2json']")
+GTIFF2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" 'peerDependencies["@weacast/gtiff2json"]')
+GRIB2JSON_TAG=$(get_json_valie "$ROOT_DIR/package.json" 'peerDependencies["@weacast/grib2json"]')
 
-load_env_files "$WORKSPACE_DIR/development/common/kalisio_dockerhub.enc.env" "$WORKSPACE_DIR/development/common/SLACK_WEBHOOK_JOBS.enc.env"
+load_env_files "$WORKSPACE_DIR/development/common/kalisio_dockerhub.enc.env"
 load_value_files "$WORKSPACE_DIR/development/common/KALISIO_DOCKERHUB_PASSWORD.enc.value"
 
 ## Build container
 ##
 
-IMAGE_NAME="weacast/weacast-$MODEL"
+IMAGE_NAME="$KALISIO_DOCKERHUB_URL/weacast/weacast-$MODEL"
 if [[ -z "$GIT_TAG" ]]; then
     VERSION=latest
     KRAWLER_TAG=latest
@@ -66,15 +67,15 @@ else
     DOCKERFILE=dockerfile.$MODEL-$LOADER
 fi
 
-echo "About to build image ${IMAGE_NAME}:${IMAGE_TAG} based on kalisio/krawler:${KRAWLER_TAG}..."
+begin_group "Building container $IMAGE_NAME:$IMAGE_TAG from krawler:$KRAWLER_TAG ..."
 
-begin_group "Building container ..."
-
-docker login --username "$KALISIO_DOCKERHUB_USERNAME" --password-stdin < "$KALISIO_DOCKERHUB_PASSWORD"
+docker login --username "$KALISIO_DOCKERHUB_USERNAME" --password-stdin "$KALISIO_DOCKERHUB_URL" < "$KALISIO_DOCKERHUB_PASSWORD"
 # DOCKER_BUILDKIT is here to be able to use Dockerfile specific dockerginore (app.Dockerfile.dockerignore)
 DOCKER_BUILDKIT=1 docker build -f "$ROOT_DIR/$DOCKERFILE" \
-    --build-arg KRAWLER_TAG=$KRAWLER_TAG --build-arg TAG=$VERSION \
-    --build-arg GTIFF2JSON_TAG=$GTIFF2JSON_TAG --build-arg GRIB2JSON_TAG=$GRIB2JSON_TAG \
+    --build-arg KRAWLER_TAG="$KRAWLER_TAG" \
+    --build-arg TAG="$VERSION" \
+    --build-arg GTIFF2JSON_TAG="$GTIFF2JSON_TAG" \
+    --build-arg GRIB2JSON_TAG="$GRIB2JSON_TAG" \
     -t "$IMAGE_NAME:$IMAGE_TAG" \
     "$ROOT_DIR"
 
@@ -84,4 +85,4 @@ fi
 
 docker logout
 
-end_group "Building container ..."
+end_group "Building container $IMAGE_NAME:$IMAGE_TAG from krawler:$KRAWLER_TAG ..."
