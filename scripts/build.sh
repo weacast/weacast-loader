@@ -43,7 +43,7 @@ init_job_infos "$ROOT_DIR"
 
 GIT_TAG=$(get_job_tag)
 GTIFF2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" 'peerDependencies["@weacast/gtiff2json"]')
-GRIB2JSON_TAG=$(get_json_valie "$ROOT_DIR/package.json" 'peerDependencies["@weacast/grib2json"]')
+GRIB2JSON_TAG=$(get_json_value "$ROOT_DIR/package.json" 'peerDependencies["@weacast/grib2json"]')
 
 load_env_files "$WORKSPACE_DIR/development/common/kalisio_dockerhub.enc.env"
 load_value_files "$WORKSPACE_DIR/development/common/KALISIO_DOCKERHUB_PASSWORD.enc.value"
