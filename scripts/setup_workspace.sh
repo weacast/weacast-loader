@@ -33,6 +33,6 @@ if [ "$CI" != true ]; then
     git_shallow_clone "$KALISIO_GITHUB_URL/weacast/weacast-loader.git" "$WORKSPACE_DIR/weacast-loader" "${WORKSPACE_TAG:-${WORKSPACE_BRANCH:-}}"
 fi
 
-setup_workspace "$WORKSPACE_DIR" "$KALISIO_GITHUB_URL/weacast/weacast-loader.git"
+setup_workspace "$WORKSPACE_DIR" "$KALISIO_GITHUB_URL/kalisio/development.git"
 
 end_group "Setting up workspace ..."
