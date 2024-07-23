@@ -12,11 +12,21 @@ WORKSPACE_DIR="$(dirname "$ROOT_DIR")"
 ## Parse options
 ##
 
+DEFAULT_NODE_VER=20
+DEFAULT_DEBIAN_VER=bookworm
+NODE_VER=$DEFAULT_NODE_VER
+DEBIAN_VER=$DEFAULT_DEBIAN_VER
 PUBLISH=false
 CI_STEP_NAME="Build"
 LOADER=
-while getopts "pr:m:l:" option; do
+while getopts "d:n:pr:m:l:" option; do
     case $option in
+        d) # defines debian version
+            DEBIAN_VER=$OPTARG
+            ;;
+        n) # defines node version
+            NODE_VER=$OPTARG
+             ;;
         p) # publish
             PUBLISH=true
             ;;
@@ -54,18 +64,20 @@ load_value_files "$WORKSPACE_DIR/development/common/KALISIO_DOCKERHUB_PASSWORD.e
 IMAGE_NAME="$KALISIO_DOCKERHUB_URL/weacast/weacast-$MODEL"
 if [[ -z "$GIT_TAG" ]]; then
     VERSION=latest
-    KRAWLER_TAG=latest
+    KRAWLER_SHORT_TAG=latest
 else
     VERSION=$(get_job_version)
-    KRAWLER_TAG=$(get_job_krawler_version)
+    KRAWLER_SHORT_TAG=$(get_job_krawler_version)
 fi
+KRAWLER_TAG="$KRAWLER_SHORT_TAG-node$NODE_VER-$DEBIAN_VER"
 if [[ -z "$LOADER" ]]; then
-    IMAGE_TAG=$VERSION
+    IMAGE_SHORT_TAG=$VERSION
     DOCKERFILE=dockerfile.$MODEL
 else
-    IMAGE_TAG=$LOADER-$VERSION
+    IMAGE_SHORT_TAG=$LOADER-$VERSION
     DOCKERFILE=dockerfile.$MODEL-$LOADER
 fi
+IMAGE_TAG="$IMAGE_SHORT_TAG-node$NODE_VER-$DEBIAN_VER"
 
 begin_group "Building container $IMAGE_NAME:$IMAGE_TAG from krawler:$KRAWLER_TAG ..."
 
@@ -73,7 +85,7 @@ docker login --username "$KALISIO_DOCKERHUB_USERNAME" --password-stdin "$KALISIO
 # DOCKER_BUILDKIT is here to be able to use Dockerfile specific dockerginore (app.Dockerfile.dockerignore)
 DOCKER_BUILDKIT=1 docker build -f "$ROOT_DIR/$DOCKERFILE" \
     --build-arg KRAWLER_TAG="$KRAWLER_TAG" \
-    --build-arg TAG="$VERSION" \
+    --build-arg TAG="$VERSION-node$NODE_VER-$DEBIAN_VER" \
     --build-arg GTIFF2JSON_TAG="$GTIFF2JSON_TAG" \
     --build-arg GRIB2JSON_TAG="$GRIB2JSON_TAG" \
     -t "$IMAGE_NAME:$IMAGE_TAG" \
@@ -81,6 +93,10 @@ DOCKER_BUILDKIT=1 docker build -f "$ROOT_DIR/$DOCKERFILE" \
 
 if [ "$PUBLISH" = true ]; then
     docker push "$IMAGE_NAME:$IMAGE_TAG"
+    if [ "$NODE_VER" = "$DEFAULT_NODE_VER" ] && [ "$DEBIAN_VER" = "$DEFAULT_DEBIAN_VER" ]; then
+        docker tag "$IMAGE_NAME:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_SHORT_TAG"
+        docker push "$IMAGE_NAME:$IMAGE_SHORT_TAG"
+    fi
 fi
 
 docker logout "$KALISIO_DOCKERHUB_URL"

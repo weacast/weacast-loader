@@ -15,7 +15,7 @@ jobs:
         run: bash ./scripts/init_runner.sh ${{ github.job }}
       - name: Setup workspace
         env:
-          GITHUB_DEVELOPMENT_TOKEN: ${{ secrets.GH_DEVELOPMENT_PAT }}
+          KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Run tests
         env:
@@ -26,11 +26,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ 16, 18, 20 ]
-        mongo: [ 4, 5, 6 ]
+        node: [ 18, 20, 22 ]
+        mongo: [ 5, 6, 7 ]
         exclude:
-          - node: 16
-            mongo: 4
+          - node: 20
+            mongo: 7
     name: Additional tests
     if: ${{ contains(github.event.head_commit.message, 'additional tests') }}
     runs-on: ubuntu-22.04
@@ -43,7 +43,7 @@ jobs:
         run: bash ./scripts/init_runner.sh ${{ github.job }}
       - name: Setup workspace
         env:
-          GITHUB_DEVELOPMENT_TOKEN: ${{ secrets.GH_DEVELOPMENT_PAT }}
+          KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh -n ${{ matrix.node }}
       - name: Run tests
         env:
@@ -58,6 +58,11 @@ jobs:
     name: Build models
     if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ 20 ]
+        debian: [ 'bookworm' ]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -67,12 +72,12 @@ jobs:
         run: bash ./scripts/init_runner.sh ${{ github.job }}
       - name: Setup workspace
         env:
-          GITHUB_DEVELOPMENT_TOKEN: ${{ secrets.GH_DEVELOPMENT_PAT }}
+          KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r "${{ github.job }} ${{ matrix.model }}"
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -p -r "${{ github.job }} ${{ matrix.model }}" -n ${{ matrix.node }} -d ${{ matrix.debian }}
 
   build_loader:
     needs: build_model
@@ -81,6 +86,8 @@ jobs:
       matrix:
         model: [ 'gfs', 'arpege', 'arome' ]
         loader: [ 'world', 'isobaric-world', 'europe', 'isobaric-europe', 'france', 'france-high' ]
+        node: [ 20 ]
+        debian: [ 'bookworm' ]
         exclude:
           - model: 'gfs'
             loader: 'europe'
@@ -114,9 +121,9 @@ jobs:
         run: bash ./scripts/init_runner.sh ${{ github.job }}
       - name: Setup workspace
         env:
-          GITHUB_DEVELOPMENT_TOKEN: ${{ secrets.GH_DEVELOPMENT_PAT }}
+          KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Build image
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r "${{ github.job }} ${{ matrix.model }}-${{ matrix.loader }}"
+        run: bash ./scripts/build.sh -m ${{ matrix.model }} -l ${{ matrix.loader }} -p -r "${{ github.job }} ${{ matrix.model }}-${{ matrix.loader }}" -n ${{ matrix.node }} -d ${{ matrix.debian }}
