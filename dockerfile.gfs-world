@@ -5,6 +5,6 @@ LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
 ENV CRON="0 20 * * * *"
 
-COPY jobfile-gfs-world.js .
+COPY --chown=node:node jobfile-gfs-world.js .
 
 CMD krawler --cron "$CRON" jobfile-gfs-world.js

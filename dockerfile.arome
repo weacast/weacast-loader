@@ -4,4 +4,4 @@ FROM weacast/weacast-arpege:${ARPEGE_TAG}
 LABEL maintainer="Kalisio <contact@kalisio.xyz>"
 
 # Install the job
-COPY job-arome.js .
+COPY --chown=node:node job-arome.js .

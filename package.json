@@ -54,8 +54,8 @@
     "mongodb": "^3.6.2"
   },
   "peerDependencies": {
-    "@kalisio/krawler": "2.5.0",
-    "@weacast/grib2json": "^2.1.7",
-    "@weacast/gtiff2json": "^2.1.7"
+    "@kalisio/krawler": "2.7.0",
+    "@weacast/grib2json": "^2.2.0",
+    "@weacast/gtiff2json": "^2.2.0"
   }
 }
