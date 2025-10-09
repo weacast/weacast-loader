@@ -16,11 +16,13 @@ jobs:
       - name: Setup workspace
         env:
           KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
+          WEACAST_GITHUB_URL: ${{ secrets.WEACAST_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Run tests
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: bash ./scripts/run_tests.sh -c -r ${{ github.job }}
+        #run: bash ./scripts/run_tests.sh -c -r ${{ github.job }}
+        run: bash ./scripts/run_tests.sh -r ${{ github.job }}
 
   additional_tests:
     strategy:
@@ -44,6 +46,7 @@ jobs:
       - name: Setup workspace
         env:
           KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
+          WEACAST_GITHUB_URL: ${{ secrets.WEACAST_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh -n ${{ matrix.node }}
       - name: Run tests
         env:
@@ -70,6 +73,7 @@ jobs:
       - name: Setup workspace
         env:
           KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
+          WEACAST_GITHUB_URL: ${{ secrets.WEACAST_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Build image
         env:
@@ -119,6 +123,7 @@ jobs:
       - name: Setup workspace
         env:
           KALISIO_GITHUB_URL: ${{ secrets.KALISIO_GITHUB_URL }}
+          WEACAST_GITHUB_URL: ${{ secrets.WEACAST_GITHUB_URL }}
         run: bash ./scripts/setup_workspace.sh
       - name: Build image
         env:
