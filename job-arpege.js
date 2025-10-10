@@ -100,7 +100,9 @@ export default (options) => {
       options: Object.assign({
         url: 'https://public-api.meteofrance.fr/public/arpege/1.0/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage',
         version: '2.0.1',
-        apikey: process.env.METEO_FRANCE_TOKEN,
+        headers: {
+          apikey: process.env.METEO_FRANCE_TOKEN
+        },
         coverageid: '<%= name %>___<%= runTime.format() %>',
         subsets: Object.assign({
           long: [options.bounds[0], options.bounds[2]],
