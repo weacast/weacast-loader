@@ -23,7 +23,10 @@ on: [ push, workflow_dispatch ]
 jobs:
   run_tests:
     name: Run tests
-    if: ${{ !contains(github.event.head_commit.message, 'skip tests') }}
+    if: ${{
+      github.event_name == 'workflow_dispatch' && inputs.run_tests ||
+      github.event_name == 'push' && !contains(github.event.head_commit.message, 'skip tests')
+      }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
@@ -80,7 +83,10 @@ jobs:
         node: [ 20 ]
         debian: [ 'bookworm' ]
     name: Build models
-    if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
+    if: ${{
+      github.event_name == 'workflow_dispatch' && inputs.build_model ||
+      github.event_name == 'push' && !contains(github.event.head_commit.message, 'skip build')
+      }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
@@ -130,7 +136,10 @@ jobs:
           - model: 'arome'
             loader: 'isobaric-europe'
     name: Build loaders
-    if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
+    if: ${{
+      github.event_name == 'workflow_dispatch' && inputs.build_loader ||
+      github.event_name == 'push' && !contains(github.event.head_commit.message, 'skip build')
+      }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
