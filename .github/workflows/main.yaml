@@ -1,4 +1,23 @@
 name: ci
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: "Run tests"
+        default: false
+        required: false
+        type: boolean
+      build_model:
+        description: "Build models"
+        default: false
+        required: false
+        type: boolean
+      build_loader:
+        description: "Build loaders"
+        default: false
+        required: false
+        type: boolean
 on: [ push, workflow_dispatch ]
 
 jobs:
