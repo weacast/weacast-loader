@@ -18,7 +18,6 @@ on:
         default: false
         required: false
         type: boolean
-on: [ push, workflow_dispatch ]
 
 jobs:
   run_tests:
