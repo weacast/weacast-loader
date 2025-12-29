@@ -2,8 +2,8 @@
 
 [![Latest Release](https://img.shields.io/github/v/tag/weacast/weacast-loader?sort=semver&label=latest)](https://github.com/weacast/weacast-loader/releases)
 [![CI](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml/badge.svg)](https://github.com/weacast/weacast-loader/actions/workflows/main.yaml)
-[![Code Climate](https://codeclimate.com/github/weacast/weacast-loader/badges/gpa.svg)](https://codeclimate.com/github/weacast/weacast-loader)
-[![Test Coverage](https://codeclimate.com/github/weacast/weacast-loader/badges/coverage.svg)](https://codeclimate.com/github/weacast/weacast-loader/coverage)
+[![Quality Gate Status](https://sonar.portal.kalisio.com/api/project_badges/measure?project=kalisio-weacast-loader&metric=alert_status&token=sqb_37bff7f5fda3d1510ec23356a47983cd9df7a680)](https://sonar.portal.kalisio.com/dashboard?id=kalisio-weacast-loader)
+[![Maintainability Issues](https://sonar.portal.kalisio.com/api/project_badges/measure?project=kalisio-weacast-loader&metric=software_quality_maintainability_issues&token=sqb_37bff7f5fda3d1510ec23356a47983cd9df7a680)](https://sonar.portal.kalisio.com/dashboard?id=kalisio-weacast-loader)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://weacast.github.io/weacast/)
 
