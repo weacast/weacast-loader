@@ -19,8 +19,8 @@ const upperLimit = (process.env.UPPER_LIMIT ? Number(process.env.UPPER_LIMIT) : 
 export default createJob({
   id: 'weacast-arpege-world',
   model: 'arpege-world',
-  bounds: [0, -90, 360, 90],
-  origin: [0, 90],
+  bounds: [-180, -90, 180, 90],
+  origin: [-180, 90],
   size: [1440, 721],
   resolution: [0.25, 0.25],
   tileResolution: [10, 10],
